@@ -760,32 +760,32 @@ window.addEventListener('load', loadDraft);
   }
 
   function clearForm() {
+  // 1. Wipe out the CORRECT storage key
+  localStorage.removeItem('fitnessDraft_v2');
 
-  // Wipe out localStorage memory
-  localStorage.removeItem('fitnessDraft');
-
-
-  // Clear all text, number, date inputs
+  // 2. Clear all text and number inputs
   document.querySelectorAll('input[type="text"], input[type="number"]').forEach(el => el.value = "");
 
-  // Reset date to today
+  // 3. Reset date and gender
   document.getElementById('pt-date').valueAsDate = new Date();
-
-  // Reset gender
   document.getElementById('pt-gender').selectedIndex = 0;
 
-  // Uncheck all checkboxes (KCO + meds not brought)
-  document.querySelectorAll('.kco-check, #meds-not-brought').forEach(el => {
+  // 4. Reset ALL status checkboxes (Added docs-not-avail here)
+  document.getElementById('docs-not-avail').checked = false;
+  document.getElementById('meds-not-brought').checked = false;
+
+  // 5. Reset KCO pills and visual styling
+  document.querySelectorAll('.kco-check').forEach(el => {
     el.checked = false;
     if (el.parentElement.classList.contains('kco-pill')) {
       el.parentElement.classList.remove('active');
     }
   });
 
-  // Reset radio buttons
+  // 6. Reset radio buttons
   document.getElementById('on-tt').checked = true;
 
-  // Reset default values
+  // 7. Reset clinical defaults (Matching your exact strings)
   document.getElementById('kco-other').value = "No PHO Surgery";
   document.getElementById('v-temp').value = "Afebrile";
   document.getElementById('v-spo2').value = "98% with RA";
@@ -798,9 +798,11 @@ window.addEventListener('load', loadDraft);
   document.getElementById('lab-echo').value = "Noted";
   document.getElementById('lab-cxr').value = "Noted";
 
-  // Clear advice and regenerate default
+  // 8. Regenerate advice and SAVE the empty state to localStorage
   generateAdvice();
+  saveDraft(); 
 }
+
   
 </script>
 
