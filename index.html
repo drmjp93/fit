@@ -824,7 +824,7 @@ window.addEventListener('load', loadDraft);
 
   try {
     // Notice this now says 'drugs-page-visits' so it counts separately!
-    const resp = await fetch("https://api.counterapi.dev/v1/drmjp93in/fit-page-visits/up");
+    const resp = await fetch("https://api.counterapi.dev/v1/drmjp93in-1/fit-page-visits/up");
     const j = await resp.json();
 
     if (j && j.count !== undefined) {
