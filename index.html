@@ -175,9 +175,10 @@
 
  <div class="section">
    
-   <div style="display: flex; gap: 10px; margin-bottom: 15px;" class="no-print">
+  <div style="display: flex; gap: 10px; margin-bottom: 15px;" class="no-print">
     <button type="button" onclick="saveToCloudClipboard()" style="background: #dbeafe; color: #1d4ed8; padding: 6px 12px; border: 1px solid #bfdbfe; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">↑ Send to Cloud</button>
     <button type="button" onclick="loadFromCloudClipboard()" style="background: #dcfce7; color: #15803d; padding: 6px 12px; border: 1px solid #bbf7d0; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">↓ Fetch from Cloud</button>
+   </div>
 
       <div class="grid-4">
         <div class="input-group"><label>Date</label><input type="date" id="pt-date"></div>
@@ -846,6 +847,88 @@ window.addEventListener('load', loadDraft);
     el.textContent = "—";
   }
 })();
+
+  // ══════════════════════════════════════════
+// CLOUD CLIPBOARD ENGINE: FITNESS PAGE
+// ══════════════════════════════════════════
+const CLOUD_API_URL = "https://clinic-clipboard.drmjp93.workers.dev"; // <-- Make sure this matches your worker!
+
+async function saveToCloudClipboard() {
+    const btn = event.target;
+    btn.innerText = "Saving...";
+
+    // Grab exactly from Fitness IDs
+    const patientData = {
+        date: document.getElementById('pt-date') ? document.getElementById('pt-date').value : '',
+        sex: document.getElementById('pt-gender') ? document.getElementById('pt-gender').value : '',
+        name: document.getElementById('pt-name') ? document.getElementById('pt-name').value : '',
+        age: document.getElementById('pt-age') ? document.getElementById('pt-age').value : '',
+        bp: document.getElementById('v-bp') ? document.getElementById('v-bp').value : '',
+        pulse: document.getElementById('v-pr') ? document.getElementById('v-pr').value : '',
+        temp: document.getElementById('v-temp') ? document.getElementById('v-temp').value : '',
+        spo2: document.getElementById('v-spo2') ? document.getElementById('v-spo2').value : '',
+        rs: document.getElementById('exam-rs') ? document.getElementById('exam-rs').value : '',
+        cvs: document.getElementById('exam-cvs') ? document.getElementById('exam-cvs').value : '',
+        pa: document.getElementById('exam-pa') ? document.getElementById('exam-pa').value : '',
+        cns: document.getElementById('exam-cns') ? document.getElementById('exam-cns').value : ''
+    };
+
+    try {
+        await fetch(`${CLOUD_API_URL}/?action=save`, {
+            method: "POST",
+            body: JSON.stringify(patientData)
+        });
+        btn.innerText = "✓ Saved!";
+        setTimeout(() => btn.innerText = "↑ Send to Cloud", 2000);
+    } catch (e) {
+        alert("Failed to save to cloud");
+        btn.innerText = "↑ Send to Cloud";
+    }
+}
+
+async function loadFromCloudClipboard() {
+    const btn = event.target;
+    btn.innerText = "Fetching...";
+
+    try {
+        const res = await fetch(`${CLOUD_API_URL}/?action=load`);
+        const data = await res.json();
+
+        if (!data.name && !data.age) {
+            alert("Cloud clipboard is empty!");
+            btn.innerText = "↓ Fetch from Cloud";
+            return;
+        }
+
+        // Paste exactly into Fitness IDs
+        if (data.date && document.getElementById('pt-date')) document.getElementById('pt-date').value = data.date;
+        if (data.name && document.getElementById('pt-name')) document.getElementById('pt-name').value = data.name;
+        if (data.age && document.getElementById('pt-age')) document.getElementById('pt-age').value = data.age;
+        if (data.bp && document.getElementById('v-bp')) document.getElementById('v-bp').value = data.bp;
+        if (data.pulse && document.getElementById('v-pr')) document.getElementById('v-pr').value = data.pulse;
+        if (data.temp && document.getElementById('v-temp')) document.getElementById('v-temp').value = data.temp;
+        if (data.spo2 && document.getElementById('v-spo2')) document.getElementById('v-spo2').value = data.spo2;
+        if (data.rs && document.getElementById('exam-rs')) document.getElementById('exam-rs').value = data.rs;
+        if (data.cvs && document.getElementById('exam-cvs')) document.getElementById('exam-cvs').value = data.cvs;
+        if (data.pa && document.getElementById('exam-pa')) document.getElementById('exam-pa').value = data.pa;
+        if (data.cns && document.getElementById('exam-cns')) document.getElementById('exam-cns').value = data.cns;
+
+        // Smart translator for Gender (OPD sends 'M', Fitness needs 'MALE')
+        if (data.sex && document.getElementById('pt-gender')) {
+            const s = data.sex.toUpperCase();
+            if (s === 'M') document.getElementById('pt-gender').value = 'MALE';
+            else if (s === 'F') document.getElementById('pt-gender').value = 'FEMALE';
+            else document.getElementById('pt-gender').value = s;
+        }
+
+        btn.innerText = "✓ Fetched!";
+        setTimeout(() => btn.innerText = "↓ Fetch from Cloud", 2000);
+    } catch (e) {
+        alert("Failed to load from cloud");
+        btn.innerText = "↓ Fetch from Cloud";
+    }
+}
+
 
   
 </script>
