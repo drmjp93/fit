@@ -180,6 +180,15 @@
     <button type="button" onclick="loadFromCloudClipboard()" style="background: #dcfce7; color: #15803d; padding: 6px 12px; border: 1px solid #bbf7d0; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">↓ Fetch from Cloud</button>
    </div>
 
+   <div style="background: #fef08a; padding: 10px; border-radius: 4px; display: flex; gap: 10px; align-items: center; margin-bottom: 15px;" class="no-print">
+    <strong style="font-size: 12px; color: #854d0e;">Local Drafts:</strong>
+    <select id="draft-selector" style="padding: 4px; font-size: 12px; flex-grow: 1; border: 1px solid #ca8a04; border-radius: 3px;">
+        <option value="">-- Select a recent patient --</option>
+    </select>
+    <button type="button" onclick="saveFitnessDraft()" style="background: #eab308; color: white; border: none; padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">💾 SAVE TO PC</button>
+    <button type="button" onclick="loadFitnessDraft()" style="background: white; color: #ca8a04; border: 1px solid #ca8a04; padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">📂 LOAD DRAFT</button>
+</div>
+   
       <div class="grid-4">
         <div class="input-group"><label>Date</label><input type="date" id="pt-date"></div>
         <div class="input-group"><label>Gender</label>
@@ -928,6 +937,109 @@ async function loadFromCloudClipboard() {
         btn.innerText = "↓ Fetch from Cloud";
     }
 }
+
+  // ══════════════════════════════════════════
+// LOCAL MEMORY BANK (RECENT 5 DRAFTS)
+// ══════════════════════════════════════════
+
+// 1. This runs as soon as the page opens to load your saved list
+document.addEventListener("DOMContentLoaded", updateDraftDropdown);
+
+function updateDraftDropdown() {
+    const select = document.getElementById('draft-selector');
+    if (!select) return;
+    
+    // Clear the dropdown and add the default option
+    select.innerHTML = '<option value="">-- Select a recent patient --</option>';
+    
+    // Get the list from the computer's memory
+    const drafts = JSON.parse(localStorage.getItem('fitness_drafts') || '[]');
+    
+    // Add each patient to the dropdown menu
+    drafts.forEach((d, index) => {
+        let opt = document.createElement('option');
+        opt.value = index;
+        opt.innerText = d.label;
+        select.appendChild(opt);
+    });
+}
+
+function saveFitnessDraft() {
+    const nameBox = document.getElementById('pt-name');
+    const ptName = nameBox && nameBox.value ? nameBox.value : 'Unknown Patient';
+    
+    // Create a label for the dropdown like: "RAHUL (10/04/2026)"
+    const today = new Date().toLocaleDateString('en-GB');
+    const draftLabel = `${ptName} (${today})`;
+
+    // Grab all the current data on the screen
+    const dataToSave = {
+        date: document.getElementById('pt-date') ? document.getElementById('pt-date').value : '',
+        sex: document.getElementById('pt-gender') ? document.getElementById('pt-gender').value : '',
+        name: ptName,
+        age: document.getElementById('pt-age') ? document.getElementById('pt-age').value : '',
+        bp: document.getElementById('v-bp') ? document.getElementById('v-bp').value : '',
+        pulse: document.getElementById('v-pr') ? document.getElementById('v-pr').value : '',
+        temp: document.getElementById('v-temp') ? document.getElementById('v-temp').value : '',
+        spo2: document.getElementById('v-spo2') ? document.getElementById('v-spo2').value : '',
+        rr: document.getElementById('v-rr') ? document.getElementById('v-rr').value : '',
+        rs: document.getElementById('exam-rs') ? document.getElementById('exam-rs').value : '',
+        cvs: document.getElementById('exam-cvs') ? document.getElementById('exam-cvs').value : '',
+        pa: document.getElementById('exam-pa') ? document.getElementById('exam-pa').value : '',
+        cns: document.getElementById('exam-cns') ? document.getElementById('exam-cns').value : ''
+    };
+
+    // Open the memory bank
+    let drafts = JSON.parse(localStorage.getItem('fitness_drafts') || '[]');
+
+    // Remove the patient if they are already in the list (so we just update them instead of making a duplicate)
+    drafts = drafts.filter(d => d.name !== ptName);
+
+    // Add the new patient to the very top of the list
+    drafts.unshift({ label: draftLabel, name: ptName, data: dataToSave });
+
+    // If the list gets longer than 5, chop off the oldest one at the bottom!
+    if (drafts.length > 5) drafts.pop();
+
+    // Save it permanently back to the computer
+    localStorage.setItem('fitness_drafts', JSON.stringify(drafts));
+    
+    updateDraftDropdown();
+    alert("✓ Draft successfully saved to this computer!");
+}
+
+function loadFitnessDraft() {
+    const select = document.getElementById('draft-selector');
+    const selectedIndex = select.value;
+    
+    if (selectedIndex === "") {
+        alert("Please select a patient from the dropdown menu first.");
+        return;
+    }
+
+    // Get the patient data out of the memory bank
+    const drafts = JSON.parse(localStorage.getItem('fitness_drafts') || '[]');
+    const patient = drafts[selectedIndex];
+
+    if (!patient) return;
+    const data = patient.data;
+
+    // Paste it back onto the screen!
+    if (data.date && document.getElementById('pt-date')) document.getElementById('pt-date').value = data.date;
+    if (data.sex && document.getElementById('pt-gender')) document.getElementById('pt-gender').value = data.sex;
+    if (data.name && document.getElementById('pt-name')) document.getElementById('pt-name').value = data.name;
+    if (data.age && document.getElementById('pt-age')) document.getElementById('pt-age').value = data.age;
+    if (data.bp && document.getElementById('v-bp')) document.getElementById('v-bp').value = data.bp;
+    if (data.pulse && document.getElementById('v-pr')) document.getElementById('v-pr').value = data.pulse;
+    if (data.temp && document.getElementById('v-temp')) document.getElementById('v-temp').value = data.temp;
+    if (data.spo2 && document.getElementById('v-spo2')) document.getElementById('v-spo2').value = data.spo2;
+    if (data.rr && document.getElementById('v-rr')) document.getElementById('v-rr').value = data.rr;
+    if (data.rs && document.getElementById('exam-rs')) document.getElementById('exam-rs').value = data.rs;
+    if (data.cvs && document.getElementById('exam-cvs')) document.getElementById('exam-cvs').value = data.cvs;
+    if (data.pa && document.getElementById('exam-pa')) document.getElementById('exam-pa').value = data.pa;
+    if (data.cns && document.getElementById('exam-cns')) document.getElementById('exam-cns').value = data.cns;
+}
+
 
 
   
