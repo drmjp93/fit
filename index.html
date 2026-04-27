@@ -234,7 +234,7 @@
 
         <div class="input-group">
           <label>Other Medical / Surgical History</label>
-          <input type="text" id="kco-other" placeholder="Any other past history" value="No PHO Surgery" style="margin-bottom: 0;">
+          <input type="text" id="kco-other" placeholder="Any other past history" value="No PHO Surgery" style="margin-bottom: 0;" oninput="this.value = this.value.toUpperCase()">
         </div>
 
         <div class="input-group">
@@ -308,13 +308,13 @@
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; align-content: start;">
-          <div class="compact-lab" style="grid-column: span 2;"><label>Hb</label><input type="text" id="lab-hb" class="arrow-nav-lab"></div>
+          <div class="compact-lab" style="grid-column: span 2;"><label>Hb</label><input type="text" id="lab-hb" class="arrow-nav-lab" oninput="generateAdvice()"></div>
           <div class="compact-lab" style="grid-column: span 2;"><label>TC</label><input type="text" id="lab-tc" class="arrow-nav-lab"></div>
           <div class="compact-lab" style="grid-column: span 2;"><label>Plt</label><input type="text" id="lab-plt" class="arrow-nav-lab"></div>
           
           <div class="compact-lab" style="grid-column: span 2;"><label>INR</label><input type="text" id="lab-inr" class="arrow-nav-lab"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>RBS</label><input type="text" id="lab-rbs" class="arrow-nav-lab"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>TSH</label><input type="text" id="lab-tsh" class="arrow-nav-lab"></div>
+          <div class="compact-lab" style="grid-column: span 2;"><label>RBS</label><input type="text" id="lab-rbs" class="arrow-nav-lab" oninput="generateAdvice()"></div>
+          <div class="compact-lab" style="grid-column: span 2;"><label>TSH</label><input type="text" id="lab-tsh" class="arrow-nav-lab" oninput="generateAdvice()"></div>
 
           <div class="compact-lab" style="grid-column: span 2;"><label>Cr</label><input type="text" id="lab-creat" class="arrow-nav-lab"></div>
           
@@ -340,6 +340,17 @@
   <div class="right-pane">
     <h3 style="margin-bottom: 5px;">Fitness Advice & Remarks</h3>
     
+    <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+      <label class="status-pill">
+        <input type="checkbox" id="chk-anesthetist" onchange="generateAdvice(); saveDraft();"> 
+        <span class="pill-text" style="padding: 4px 8px; font-size: 0.75rem;">🩺 Anesthetist Fitness Req.</span>
+      </label>
+      <label class="status-pill">
+        <input type="checkbox" id="chk-cont-meds" onchange="generateAdvice(); saveDraft();"> 
+        <span class="pill-text" style="padding: 4px 8px; font-size: 0.75rem;">💊 Continue Meds</span>
+      </label>
+    </div>
+
     <div id="advice-box" contenteditable="true" style="flex-grow: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 12px; overflow-y: auto; background: #fff; line-height: 1.5; margin-bottom: 15px;"></div>
     
     <button class="btn-clear" onclick="clearForm()">🧹 Clear Form</button>
@@ -614,103 +625,92 @@ window.addEventListener('load', loadDraft);
     saveDraft();
   }
 
-// Smart Advice Generation (Merged Paragraphs)
-  function generateAdvice() {
-    let kco = Array.from(document.querySelectorAll('.kco-check:checked')).map(el => el.value);
-    
+// Smart Advice Generation (Merged Paragraphs & Lab Checks)
+function generateAdvice() {
+  let kco = Array.from(document.querySelectorAll('.kco-check:checked')).map(el => el.value);
+  
+  // --- NEW: AUTO LAB CHECKS ---
+  // Extract numbers using regex in case you type units (e.g., "9.5 g/dl")
+  let extractNum = (val) => { let m = val.match(/[\d.]+/); return m ? parseFloat(m[0]) : NaN; };
+  
+  let hb = extractNum(document.getElementById('lab-hb').value);
+  let rbs = extractNum(document.getElementById('lab-rbs').value);
+  let tsh = extractNum(document.getElementById('lab-tsh').value);
+
+  let unfitReasons = [];
+  if (!isNaN(hb) && hb < 10) unfitReasons.push(`Hb is ${hb} (<10)`);
+  if (!isNaN(rbs) && rbs > 200) unfitReasons.push(`RBS is ${rbs} (>200)`);
+  if (!isNaN(tsh) && tsh > 5) unfitReasons.push(`TSH is ${tsh} (>5)`);
+
+  let para1 = "";
+  if (unfitReasons.length > 0) {
+    para1 = `<span style="color: #ef4444;"><strong>FITNESS CANNOT BE GIVEN</strong> (Flagged: ${unfitReasons.join(", ")})</span>`;
+  } else {
     // Paragraph 1: Fitness Status & Merged Goals
     let fitConditions = [];
     if (kco.includes('HTN')) fitConditions.push("BP <= 140/90 mmHg");
     if (kco.includes('DM')) fitConditions.push("RBS <= 200 mg/dL");
     
-    let para1 = "Patient is fit for surgery";
+    para1 = "Patient is fit for surgery";
     if (fitConditions.length > 0) {
       para1 += ` with due risk, if ${fitConditions.join(" & ")} on day of OT.`;
     } else {
       para1 += " with due risk."; // Fallback if neither DM nor HTN is checked
     }
-
-    // Paragraph 2: Medication Instructions (separated lines)
-    let medInstructions = [];
-    
-    if (kco.includes('DM')) {
-      // Oral Hypoglycemics & SGLT2i Guidelines
-      medInstructions.push("Diabetes (OHAs): Omit morning dose of Oral Hypoglycemic Agents on the day of surgery. *Note for Major OT: Stop SGLT2 inhibitors (e.g., Dapagliflozin, Empagliflozin) 3 to 4 days prior to major surgery to avoid euglycemic DKA.*");
-      
-      // Insulin Guidelines
-      medInstructions.push("Diabetes (Insulin): Omit short-acting/prandial insulin on the morning of surgery. Administer 50-80% of usual long-acting/basal insulin dose. Bridge with short-acting insulin sliding scale to maintain perioperative target RBS of 140-180 mg/dL.");
-    }
-    
-    if (kco.includes('HTN')) {
-      // What to Stop
-      medInstructions.push("Hypertension (Stop): Omit ACE Inhibitors / ARBs and Diuretics on the morning of surgery to prevent refractory perioperative hypotension and volume depletion.");
-      
-      // What to Continue
-      medInstructions.push("Hypertension (Continue): Strict continuation of Beta-blockers, Calcium Channel Blockers, or other anti-hypertensives on the morning of surgery with a sip of water.");
-    }
-
-    // (Your existing Antiplatelet/Anticoagulant code would go here)
-    
-    if (kco.includes('IHD') || kco.includes('S/P CABG') || kco.includes('S/P PTCA')) {
-        
-        // Antiplatelet Guidelines
-        medInstructions.push("Antiplatelets: Stop Clopidogrel/Ticagrelor 5 days (Prasugrel 7 days) before surgery. Resume 24 hours post-op once hemostasis is achieved.");
-        medInstructions.push("Aspirin: Continue perioperatively (except in strict neuro, uro, or ophthalmic surgeries).");
-        
-        // Anticoagulant: Cataract / Minimal Bleeding Risk
-        medInstructions.push("Warfarin (Cataract/Minor): Continue therapy. Check INR 24-72 hours prior (target 2-3). Stop if INR > 3. No LMWH bridging required.");
-        medInstructions.push("DOACs (Cataract/Minor): Continue therapy. No bridging or blood IVx required.");
-
-        // Anticoagulant: Major Surgery / High Bleeding Risk
-        medInstructions.push("Warfarin (Major OT): Stop 5 days prior. Bridge with LMWH (1mg/kg BID) ONLY for high thrombotic risk. Stop LMWH 24h before surgery. Resume Warfarin 12-24 hours post-op. Restart LMWH 48-72 hours post-op until INR ≥ 2.0.");
-        medInstructions.push("DOACs (Major OT): Strictly avoid LMWH bridging. Standard renal function: stop 24h prior (low bleeding risk sx) or 48h prior (high bleeding risk sx). Impaired renal function (CrCl 15-50): stop 48h prior (low risk) or 72-96h prior (high risk). Resume 24h post op (Low bleeding risk sx); 48-72h (high bleeding risk sx)");
-
-    } 
-    
-    // Respiratory (Asthma/COPD)
-    if (kco.includes('Asthma') || kco.includes('COPD')) {
-      medInstructions.push("Asthma/COPD: Continue all inhalers morning of surgery; consider pre-op nebulization and avoid elective OT if active wheeze or acute exacerbation is present.");
-    }
-
-    // Thyroid Disorders
-    if (kco.includes('Thyroid Disorder') || kco.includes('Hyperthyroid') || kco.includes('Hypothyroid')) {
-      medInstructions.push("Thyroid: Continue thyroid medications morning of surgery; ensure euthyroid state (normal TSH/T3/T4) prior to elective OT to prevent thyroid storm or myxedema coma.");
-    }
-
-    // Seizure Disorder / Epilepsy
-    if (kco.includes('Epilepsy')) {
-      medInstructions.push("Seizures: Strictly continue all anti-epileptic drugs on the morning of surgery with a sip of water to prevent breakthrough perioperative seizures.");
-    }
-
-    // Chronic Kidney Disease (CKD) / Dialysis
-    if (kco.includes('CKD')) {
-      medInstructions.push("CKD/Dialysis: Schedule hemodialysis the day before elective surgery (never on the day of), and strictly avoid NSAIDs for post-op analgesia.");
-    }
-
-    // Chronic Steroid Use
-    if (kco.includes('Chronic Steroids')) {
-      medInstructions.push("Chronic Steroids: Continue morning oral steroid dose and administer intra-operative IV stress-dose hydrocortisone to prevent acute adrenal crisis.");
-    }
-
-    // Obstructive Sleep Apnea (OSA)
-    if (kco.includes('OSA')) {
-      medInstructions.push("OSA: Instruct patient to bring their personal CPAP/BiPAP machine to the hospital for immediate post-op use in the recovery room; use opioids with extreme caution.");
-    }
-
-    // Psychiatric Medications
-    if (kco.includes('Psychiatry')) {
-      medInstructions.push("Psychiatry: Stop Lithium 24-48 hours prior to major surgery to avoid toxicity; continue SSRIs/SNRIs on the morning of surgery.");
-    }
-
-    let adviceHTML = `<span style="font-weight: bold; font-size: 1rem;">${para1}</span>`;
-    
-    if (medInstructions.length > 0) {
-      adviceHTML += `<br><br><span style="font-weight: normal; font-size: 0.85rem;"><strong>Medication Instructions:</strong><br>• ` + medInstructions.join("<br>• ") + `</span>`;
-    }
-
-    document.getElementById('advice-box').innerHTML = adviceHTML;
-    saveDraft();
   }
+
+  // Paragraph 2: Medication Instructions (separated lines)
+  let medInstructions = [];
+  
+  if (kco.includes('DM')) {
+    medInstructions.push("Diabetes (OHAs): Omit morning dose of Oral Hypoglycemic Agents on the day of surgery. *Note for Major OT: Stop SGLT2 inhibitors (e.g., Dapagliflozin, Empagliflozin) 3 to 4 days prior to major surgery to avoid euglycemic DKA.*");
+    medInstructions.push("Diabetes (Insulin): Omit short-acting/prandial insulin on the morning of surgery. Administer 50-80% of usual long-acting/basal insulin dose. Bridge with short-acting insulin sliding scale to maintain perioperative target RBS of 140-180 mg/dL.");
+  }
+  
+  if (kco.includes('HTN')) {
+    medInstructions.push("Hypertension (Stop): Omit ACE Inhibitors / ARBs and Diuretics on the morning of surgery to prevent refractory perioperative hypotension and volume depletion.");
+    medInstructions.push("Hypertension (Continue): Strict continuation of Beta-blockers, Calcium Channel Blockers, or other anti-hypertensives on the morning of surgery with a sip of water.");
+  }
+  
+  if (kco.includes('IHD') || kco.includes('S/P CABG') || kco.includes('S/P PTCA')) {
+      medInstructions.push("Antiplatelets: Stop Clopidogrel/Ticagrelor 5 days (Prasugrel 7 days) before surgery. Resume 24 hours post-op once hemostasis is achieved.");
+      medInstructions.push("Aspirin: Continue perioperatively (except in strict neuro, uro, or ophthalmic surgeries).");
+      medInstructions.push("Warfarin (Cataract/Minor): Continue therapy. Check INR 24-72 hours prior (target 2-3). Stop if INR > 3. No LMWH bridging required.");
+      medInstructions.push("DOACs (Cataract/Minor): Continue therapy. No bridging or blood IVx required.");
+      medInstructions.push("Warfarin (Major OT): Stop 5 days prior. Bridge with LMWH (1mg/kg BID) ONLY for high thrombotic risk. Stop LMWH 24h before surgery. Resume Warfarin 12-24 hours post-op. Restart LMWH 48-72 hours post-op until INR ≥ 2.0.");
+      medInstructions.push("DOACs (Major OT): Strictly avoid LMWH bridging. Standard renal function: stop 24h prior (low bleeding risk sx) or 48h prior (high bleeding risk sx). Impaired renal function (CrCl 15-50): stop 48h prior (low risk) or 72-96h prior (high risk). Resume 24h post op (Low bleeding risk sx); 48-72h (high bleeding risk sx)");
+  } 
+  
+  if (kco.includes('Asthma') || kco.includes('COPD')) medInstructions.push("Asthma/COPD: Continue all inhalers morning of surgery; consider pre-op nebulization and avoid elective OT if active wheeze or acute exacerbation is present.");
+  if (kco.includes('Thyroid Disorder') || kco.includes('Hyperthyroid') || kco.includes('Hypothyroid')) medInstructions.push("Thyroid: Continue thyroid medications morning of surgery; ensure euthyroid state (normal TSH/T3/T4) prior to elective OT to prevent thyroid storm or myxedema coma.");
+  if (kco.includes('Epilepsy')) medInstructions.push("Seizures: Strictly continue all anti-epileptic drugs on the morning of surgery with a sip of water to prevent breakthrough perioperative seizures.");
+  if (kco.includes('CKD')) medInstructions.push("CKD/Dialysis: Schedule hemodialysis the day before elective surgery (never on the day of), and strictly avoid NSAIDs for post-op analgesia.");
+  if (kco.includes('Chronic Steroids')) medInstructions.push("Chronic Steroids: Continue morning oral steroid dose and administer intra-operative IV stress-dose hydrocortisone to prevent acute adrenal crisis.");
+  if (kco.includes('OSA')) medInstructions.push("OSA: Instruct patient to bring their personal CPAP/BiPAP machine to the hospital for immediate post-op use in the recovery room; use opioids with extreme caution.");
+  if (kco.includes('Psychiatry')) medInstructions.push("Psychiatry: Stop Lithium 24-48 hours prior to major surgery to avoid toxicity; continue SSRIs/SNRIs on the morning of surgery.");
+
+  let adviceHTML = `<span style="font-weight: bold; font-size: 1rem;">${para1}</span>`;
+  
+  if (medInstructions.length > 0) {
+    adviceHTML += `<br><br><span style="font-weight: normal; font-size: 0.85rem;"><strong>Medication Instructions:</strong><br>• ` + medInstructions.join("<br>• ") + `</span>`;
+  }
+
+  // --- NEW: CHECKBOX APPENDS ---
+  let appends = [];
+  if (document.getElementById('chk-anesthetist') && document.getElementById('chk-anesthetist').checked) {
+      appends.push("<strong>Final fitness will be given by anesthetist.</strong>");
+  }
+  if (document.getElementById('chk-cont-meds') && document.getElementById('chk-cont-meds').checked) {
+      appends.push("<strong>Continue all regular medications as advised.</strong>");
+  }
+
+  if (appends.length > 0) {
+      adviceHTML += `<br><br><span style="font-weight: normal; font-size: 0.85rem; color: #0284c7;">` + appends.join("<br>") + `</span>`;
+  }
+
+  document.getElementById('advice-box').innerHTML = adviceHTML;
+  saveDraft();
+}
 
   // Dynamic Print Preparation
   function preparePrint() {
@@ -834,6 +834,9 @@ window.addEventListener('load', loadDraft);
   document.getElementById('lab-ecg').value = "WNL";
   document.getElementById('lab-echo').value = "Noted";
   document.getElementById('lab-cxr').value = "Noted";
+
+  document.getElementById('chk-anesthetist').checked = false;
+  document.getElementById('chk-cont-meds').checked = false;
 
   // 8. Regenerate advice and SAVE the empty state to localStorage
   generateAdvice();
