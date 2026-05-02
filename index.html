@@ -689,19 +689,20 @@ function generateAdvice() {
   if (kco.includes('OSA')) medInstructions.push("OSA: Instruct patient to bring their personal CPAP/BiPAP machine to the hospital for immediate post-op use in the recovery room; use opioids with extreme caution.");
   if (kco.includes('Psychiatry')) medInstructions.push("Psychiatry: Stop Lithium 24-48 hours prior to major surgery to avoid toxicity; continue SSRIs/SNRIs on the morning of surgery.");
 
-  let adviceHTML = `<span style="font-weight: bold; font-size: 1rem;">${para1}</span>`;
-  
-  if (medInstructions.length > 0) {
+   let adviceHTML = `<span style="font-weight: bold; font-size: 1rem;">${para1}</span>`;
+
+  const contMeds = document.getElementById('chk-cont-meds') && document.getElementById('chk-cont-meds').checked;
+
+  if (!contMeds && medInstructions.length > 0) {
     adviceHTML += `<br><br><span style="font-weight: normal; font-size: 0.85rem;"><strong>Medication Instructions:</strong><br>• ` + medInstructions.join("<br>• ") + `</span>`;
   }
 
-  // --- NEW: CHECKBOX APPENDS ---
   let appends = [];
   if (document.getElementById('chk-anesthetist') && document.getElementById('chk-anesthetist').checked) {
       appends.push("<strong>Final fitness will be given by anesthetist.</strong>");
   }
-  if (document.getElementById('chk-cont-meds') && document.getElementById('chk-cont-meds').checked) {
-      appends.push("<strong>Continue all regular medications as advised.</strong>");
+  if (contMeds) {
+      appends.push("<strong>Continue all ongoing medications as prescribed.</strong>");
   }
 
   if (appends.length > 0) {
@@ -711,7 +712,6 @@ function generateAdvice() {
   document.getElementById('advice-box').innerHTML = adviceHTML;
   saveDraft();
 }
-
   // Dynamic Print Preparation
   function preparePrint() {
     // 1. Demographics
