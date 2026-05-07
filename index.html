@@ -1070,7 +1070,61 @@ function loadFitnessDraft() {
     if (data.cns && document.getElementById('exam-cns')) document.getElementById('exam-cns').value = data.cns;
 }
 
+// ═══════════════════════════════════════════
+// STATS PING ENGINE  (FITNESS PAGE)
+// ═══════════════════════════════════════════
+(function() {
+  const SOURCE      = 'fitness';
+  const PING_URL    = 'https://opd-api.drmjp93.workers.dev/ping';
+  const MAINT_KEY   = 'statsMaintenanceMode_fitness';
 
+  function buildMaintBtn() {
+    const existing = document.getElementById('statsMaintBtn');
+    if (existing) return;
+    const btn = document.createElement('button');
+    btn.id = 'statsMaintBtn';
+    btn.title = 'Toggle Stats Maintenance Mode';
+    const isMaint = localStorage.getItem(MAINT_KEY) === 'true';
+    btn.innerHTML = isMaint ? '🔧 MAINT' : '📊 LIVE';
+    btn.style.cssText = `
+      position:fixed; bottom:36px; right:16px; z-index:99999;
+      padding:4px 10px; border-radius:6px; border:none; cursor:pointer;
+      font-size:10px; font-weight:900; letter-spacing:.5px;
+      background:${isMaint ? '#ef4444' : '#10b981'}; color:#fff;
+      box-shadow:0 2px 8px rgba(0,0,0,.25); transition:background .2s;
+    `;
+    btn.onclick = () => {
+      const current = localStorage.getItem(MAINT_KEY) === 'true';
+      localStorage.setItem(MAINT_KEY, (!current).toString());
+      btn.innerHTML = !current ? '🔧 MAINT' : '📊 LIVE';
+      btn.style.background = !current ? '#ef4444' : '#10b981';
+    };
+    document.body.appendChild(btn);
+  }
+
+  function pingStats() {
+    if (localStorage.getItem(MAINT_KEY) === 'true') return;
+    const today = new Date().toLocaleDateString('en-CA');
+    fetch(PING_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: today, source: SOURCE })
+    }).catch(() => {});
+  }
+
+  // Hook into existing preparePrint
+  const _orig = window.preparePrint;
+  window.preparePrint = function() {
+    if (typeof _orig === 'function') _orig.apply(this, arguments);
+    pingStats();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', buildMaintBtn);
+  } else {
+    buildMaintBtn();
+  }
+})();
 
   
 </script>
