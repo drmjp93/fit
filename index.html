@@ -1107,10 +1107,13 @@ function loadFitnessDraft() {
     const today = new Date().toLocaleDateString('en-CA');
     fetch(PING_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Secret-Key': 'DrMJP_Secure_2026'   // ← ADD THIS
+      },
       body: JSON.stringify({ date: today, source: SOURCE })
     }).catch(() => {});
-  }
+}
 
   // Hook into existing preparePrint
   const _orig = window.preparePrint;
