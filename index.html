@@ -354,6 +354,15 @@
     <div id="advice-box" contenteditable="true" style="flex-grow: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 12px; overflow-y: auto; background: #fff; line-height: 1.5; margin-bottom: 15px;"></div>
     
     <button class="btn-clear" onclick="clearForm()">🧹 Clear Form</button>
+
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px;">
+    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; font-size: 0.9rem; color: #166534; user-select: none;">
+        <input type="checkbox" id="fitnessLogPill" style="width: 18px; height: 18px; cursor: pointer; accent-color: #10b981;">
+        📋 Log this certificate to Stats
+    </label>
+    <span style="font-size: 0.75rem; color: #64748b; font-style: italic;">Check if patient is receiving certificate today</span>
+</div>
+    
     <button class="btn-print" onclick="preparePrint()">🖨️ Print Certificate</button>
   </div>
 </div>
@@ -806,6 +815,28 @@ function generateAdvice() {
             }
         }).catch(e => console.error("Fitness Counter error:", e));
     // -------------------------------------------------------------
+
+
+    // --- Log to Stats only if pill is checked ---
+    const logPill = document.getElementById('fitnessLogPill');
+    if (logPill && logPill.checked) {
+        const MAINT_KEY = 'statsMaintenanceMode_fitness';
+        if (localStorage.getItem(MAINT_KEY) !== 'true') {
+            fetch('https://opd-api.drmjp93.workers.dev/ping', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Secret-Key': 'DrMJP_Secure_2026'
+                },
+                body: JSON.stringify({ 
+                    date: new Date().toLocaleDateString('en-CA'), 
+                    source: 'fitness' 
+                })
+            }).catch(() => {});
+        }
+        // Auto-uncheck after print so next patient starts fresh
+        logPill.checked = false;
+    }
     
     window.print();
   }
@@ -1116,12 +1147,6 @@ function loadFitnessDraft() {
     }).catch(() => {});
 }
 
-  // Hook into existing preparePrint
-  const _orig = window.preparePrint;
-  window.preparePrint = function() {
-    if (typeof _orig === 'function') _orig.apply(this, arguments);
-    pingStats();
-  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', buildMaintBtn);
