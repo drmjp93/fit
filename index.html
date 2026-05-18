@@ -61,6 +61,24 @@
       background: #cbd5e1;
     }
 
+/* Compact Lab Textareas (ECG, ECHO, CXR) */
+    .compact-lab textarea.auto-wrap {
+      border: none;
+      padding: 6px;
+      font-size: 0.85rem;
+      width: 100%;
+      border-radius: 0;
+      outline: none;
+      resize: none; /* Disables manual dragging */
+      margin-bottom: 0;
+      line-height: 1.4;
+      overflow: hidden;
+      font-family: inherit;
+    }
+    .compact-lab textarea.auto-wrap:focus {
+      background: #f0f9ff;
+    }
+
 /* Ultra-Compact Status Pills */
     .status-pill { display: inline-block; cursor: pointer; user-select: none; }
     .status-pill input { display: none; }
@@ -316,7 +334,7 @@
           <div class="compact-lab" style="grid-column: span 2;"><label>RBS</label><input type="text" id="lab-rbs" class="arrow-nav-lab" oninput="generateAdvice()"></div>
           <div class="compact-lab" style="grid-column: span 2;"><label>TSH</label><input type="text" id="lab-tsh" class="arrow-nav-lab" oninput="generateAdvice()"></div>
 
-          <div class="compact-lab" style="grid-column: span 2;"><label>Cr</label><input type="text" id="lab-creat" class="arrow-nav-lab"></div>
+          <div class="compact-lab" style="grid-column: span 2;"><label>S.Creat</label><input type="text" id="lab-creat" class="arrow-nav-lab"></div>
           
           <div class="compact-lab" style="grid-column: span 2;"><label>SGPT</label><input type="text" id="lab-sgpt" class="arrow-nav-lab"></div>
 
@@ -326,10 +344,10 @@
           <div class="compact-lab" style="grid-column: span 2;"><label>PT</label><input type="text" id="lab-pt" class="arrow-nav-lab"></div>
           <div class="compact-lab" style="grid-column: span 2;"><label>Urine</label><input type="text" id="lab-urine" class="arrow-nav-lab" value="Noted"></div>
           
-          <div class="compact-lab" style="grid-column: span 3;"><label>ECG</label><input type="text" id="lab-ecg" class="arrow-nav-lab" value="WNL"></div>
-          <div class="compact-lab" style="grid-column: span 3;"><label>ECHO</label><input type="text" id="lab-echo" class="arrow-nav-lab" value="Noted"></div>
-          
-          <div class="compact-lab" style="grid-column: span 3;"><label>CXR</label><input type="text" id="lab-cxr" class="arrow-nav-lab" value="Noted"></div>
+          <div class="compact-lab" style="grid-column: span 3;"><label>ECG</label><textarea id="lab-ecg" class="auto-wrap" rows="1">WNL</textarea></div>
+          <div class="compact-lab" style="grid-column: span 3;"><label>ECHO</label><textarea id="lab-echo" class="auto-wrap" rows="1">Noted</textarea></div>
+          <div class="compact-lab" style="grid-column: span 3;"><label>CXR</label><textarea id="lab-cxr" class="auto-wrap" rows="1">Noted</textarea></div>
+         
           <div class="compact-lab" style="grid-column: span 3;"><label>SpO2</label><input type="text" id="v-spo2" class="arrow-nav-lab" value="98% with RA"></div>
         </div>
 
@@ -888,7 +906,24 @@ function generateAdvice() {
   saveDraft(); 
 }
 
+// ==========================================
+  // AUTO-EXPANDING TEXTAREAS FOR LONG LABS
+  // ==========================================
+  document.querySelectorAll('.auto-wrap').forEach(el => {
+    // Function to adjust height dynamically
+    const resize = () => {
+      el.style.height = 'auto';
+      el.style.height = (el.scrollHeight) + 'px';
+    };
+    
+    // Resize on input
+    el.addEventListener('input', resize);
+    
+    // Delay initial resize slightly to ensure CSS has loaded
+    setTimeout(resize, 100); 
+  });
 
+  
 // ========================================================
 // PAGE LOAD COUNTERS (Visitors & Read-Only Fitness Given)
 // ========================================================
@@ -1101,6 +1136,49 @@ function loadFitnessDraft() {
     if (data.pa && document.getElementById('exam-pa')) document.getElementById('exam-pa').value = data.pa;
     if (data.cns && document.getElementById('exam-cns')) document.getElementById('exam-cns').value = data.cns;
 }
+
+// ==========================================
+  // PLATELET SMART AUTO-FORMATTER & VISUAL FEEDBACK
+  // ==========================================
+  document.getElementById('lab-plt').addEventListener('input', function (e) {
+    let raw = this.value.replace(/,/g, '');
+    let numValue = parseInt(raw, 10);
+    let labelEl = this.previousElementSibling; // Grabs the grey <label> box
+
+    // Set up label for stacked text
+    labelEl.style.flexDirection = 'column';
+    labelEl.style.lineHeight = '1';
+    labelEl.style.padding = '4px 2px';
+
+    if (/^\d+$/.test(raw)) {
+      // 1. Auto-format with commas (Indian System)
+      this.value = Number(raw).toLocaleString('en-IN');
+
+      // 2. Visual Text Feedback inside the Label
+      if (numValue >= 100000) {
+        // Calculates Lakhs (e.g., 150000 -> 1.5)
+        let lakhs = parseFloat((numValue / 100000).toFixed(2));
+        labelEl.innerHTML = `Plt<br><span style="font-size:0.65rem; color:#15803d; font-weight:900; margin-top:3px;">${lakhs} L</span>`;
+        
+        this.style.color = ''; // Keep input standard color
+        this.style.fontWeight = 'bold';
+      } else {
+        // Calculates Thousands (e.g., 50000 -> 50)
+        let k = parseFloat((numValue / 1000).toFixed(1));
+        labelEl.innerHTML = `Plt<br><span style="font-size:0.65rem; color:#dc2626; font-weight:900; margin-top:3px;">${k} K</span>`;
+        
+        this.style.color = '#dc2626'; // Alert! Make input text Red
+        this.style.fontWeight = 'bold';
+      }
+    } else {
+      // Reset to default if field is cleared or you type text (like "Adequate")
+      labelEl.innerHTML = `Plt`;
+      this.style.color = '';
+      this.style.fontWeight = 'normal';
+    }
+  });
+
+
 
 // ═══════════════════════════════════════════
 // STATS PING ENGINE  (FITNESS PAGE)
