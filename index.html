@@ -1064,43 +1064,58 @@ function updateDraftDropdown() {
 function saveFitnessDraft() {
     const nameBox = document.getElementById('pt-name');
     const ptName = nameBox && nameBox.value ? nameBox.value : 'Unknown Patient';
-    
-    // Create a label for the dropdown like: "RAHUL (10/04/2026)"
     const today = new Date().toLocaleDateString('en-GB');
     const draftLabel = `${ptName} (${today})`;
 
-    // Grab all the current data on the screen
     const dataToSave = {
-        date: document.getElementById('pt-date') ? document.getElementById('pt-date').value : '',
-        sex: document.getElementById('pt-gender') ? document.getElementById('pt-gender').value : '',
-        name: ptName,
-        age: document.getElementById('pt-age') ? document.getElementById('pt-age').value : '',
-        bp: document.getElementById('v-bp') ? document.getElementById('v-bp').value : '',
-        pulse: document.getElementById('v-pr') ? document.getElementById('v-pr').value : '',
-        temp: document.getElementById('v-temp') ? document.getElementById('v-temp').value : '',
-        spo2: document.getElementById('v-spo2') ? document.getElementById('v-spo2').value : '',
-        rr: document.getElementById('v-rr') ? document.getElementById('v-rr').value : '',
-        rs: document.getElementById('exam-rs') ? document.getElementById('exam-rs').value : '',
-        cvs: document.getElementById('exam-cvs') ? document.getElementById('exam-cvs').value : '',
-        pa: document.getElementById('exam-pa') ? document.getElementById('exam-pa').value : '',
-        cns: document.getElementById('exam-cns') ? document.getElementById('exam-cns').value : ''
+        date:    document.getElementById('pt-date')?.value || '',
+        sex:     document.getElementById('pt-gender')?.value || '',
+        name:    ptName,
+        age:     document.getElementById('pt-age')?.value || '',
+        ot:      document.getElementById('pt-ot')?.value || '',        // ✅ PROCEDURE
+        bp:      document.getElementById('v-bp')?.value || '',
+        pulse:   document.getElementById('v-pr')?.value || '',
+        temp:    document.getElementById('v-temp')?.value || '',
+        spo2:    document.getElementById('v-spo2')?.value || '',
+        rr:      document.getElementById('v-rr')?.value || '',
+        rs:      document.getElementById('exam-rs')?.value || '',
+        cvs:     document.getElementById('exam-cvs')?.value || '',
+        pa:      document.getElementById('exam-pa')?.value || '',
+        cns:     document.getElementById('exam-cns')?.value || '',
+        // ✅ ALL LABS
+        hb:      document.getElementById('lab-hb')?.value || '',
+        tc:      document.getElementById('lab-tc')?.value || '',
+        plt:     document.getElementById('lab-plt')?.value || '',
+        inr:     document.getElementById('lab-inr')?.value || '',
+        rbs:     document.getElementById('lab-rbs')?.value || '',
+        tsh:     document.getElementById('lab-tsh')?.value || '',
+        creat:   document.getElementById('lab-creat')?.value || '',
+        sgpt:    document.getElementById('lab-sgpt')?.value || '',
+        hba1c:   document.getElementById('lab-hba1c')?.value || '',
+        aptt:    document.getElementById('lab-aptt')?.value || '',
+        pt:      document.getElementById('lab-pt')?.value || '',
+        urine:   document.getElementById('lab-urine')?.value || '',
+        // ✅ REPORTS (textareas)
+        ecg:     document.getElementById('lab-ecg')?.value || '',
+        echo:    document.getElementById('lab-echo')?.value || '',
+        cxr:     document.getElementById('lab-cxr')?.value || '',
+        // ✅ KCO CHECKBOXES
+        kco:     Array.from(document.querySelectorAll('.kco-check'))
+                      .filter(cb => cb.checked).map(cb => cb.value),
+        kcoOther: document.getElementById('kco-other')?.value || '',
+        // ✅ STATUS PILLS
+        docsNotAvail:  document.getElementById('docs-not-avail')?.checked || false,
+        medsNotBrought: document.getElementById('meds-not-brought')?.checked || false,
+        onTT:          document.getElementById('on-tt')?.checked ?? true,
+        // ✅ ADVICE BOX
+        adviceHtml: document.getElementById('advice-box')?.innerHTML || ''
     };
 
-    // Open the memory bank
     let drafts = JSON.parse(localStorage.getItem('fitness_drafts') || '[]');
-
-    // Remove the patient if they are already in the list (so we just update them instead of making a duplicate)
     drafts = drafts.filter(d => d.name !== ptName);
-
-    // Add the new patient to the very top of the list
     drafts.unshift({ label: draftLabel, name: ptName, data: dataToSave });
-
-    // If the list gets longer than 5, chop off the oldest one at the bottom!
     if (drafts.length > 5) drafts.pop();
-
-    // Save it permanently back to the computer
     localStorage.setItem('fitness_drafts', JSON.stringify(drafts));
-    
     updateDraftDropdown();
     alert("✓ Draft successfully saved to this computer!");
 }
@@ -1108,33 +1123,70 @@ function saveFitnessDraft() {
 function loadFitnessDraft() {
     const select = document.getElementById('draft-selector');
     const selectedIndex = select.value;
-    
-    if (selectedIndex === "") {
-        alert("Please select a patient from the dropdown menu first.");
-        return;
-    }
+    if (selectedIndex === "") { alert("Please select a patient from the dropdown menu first."); return; }
 
-    // Get the patient data out of the memory bank
     const drafts = JSON.parse(localStorage.getItem('fitness_drafts') || '[]');
     const patient = drafts[selectedIndex];
-
     if (!patient) return;
-    const data = patient.data;
+    const d = patient.data;
 
-    // Paste it back onto the screen!
-    if (data.date && document.getElementById('pt-date')) document.getElementById('pt-date').value = data.date;
-    if (data.sex && document.getElementById('pt-gender')) document.getElementById('pt-gender').value = data.sex;
-    if (data.name && document.getElementById('pt-name')) document.getElementById('pt-name').value = data.name;
-    if (data.age && document.getElementById('pt-age')) document.getElementById('pt-age').value = data.age;
-    if (data.bp && document.getElementById('v-bp')) document.getElementById('v-bp').value = data.bp;
-    if (data.pulse && document.getElementById('v-pr')) document.getElementById('v-pr').value = data.pulse;
-    if (data.temp && document.getElementById('v-temp')) document.getElementById('v-temp').value = data.temp;
-    if (data.spo2 && document.getElementById('v-spo2')) document.getElementById('v-spo2').value = data.spo2;
-    if (data.rr && document.getElementById('v-rr')) document.getElementById('v-rr').value = data.rr;
-    if (data.rs && document.getElementById('exam-rs')) document.getElementById('exam-rs').value = data.rs;
-    if (data.cvs && document.getElementById('exam-cvs')) document.getElementById('exam-cvs').value = data.cvs;
-    if (data.pa && document.getElementById('exam-pa')) document.getElementById('exam-pa').value = data.pa;
-    if (data.cns && document.getElementById('exam-cns')) document.getElementById('exam-cns').value = data.cns;
+    // Basic info
+    if (d.date)  document.getElementById('pt-date').value  = d.date;
+    if (d.sex)   document.getElementById('pt-gender').value = d.sex;
+    if (d.name)  document.getElementById('pt-name').value  = d.name;
+    if (d.age)   document.getElementById('pt-age').value   = d.age;
+    if (d.ot)    document.getElementById('pt-ot').value    = d.ot;    // ✅ PROCEDURE
+
+    // Vitals
+    if (d.bp)    document.getElementById('v-bp').value    = d.bp;
+    if (d.pulse) document.getElementById('v-pr').value    = d.pulse;
+    if (d.temp)  document.getElementById('v-temp').value  = d.temp;
+    if (d.spo2)  document.getElementById('v-spo2').value  = d.spo2;
+    if (d.rr)    document.getElementById('v-rr').value    = d.rr;
+
+    // Exam
+    if (d.rs)    document.getElementById('exam-rs').value  = d.rs;
+    if (d.cvs)   document.getElementById('exam-cvs').value = d.cvs;
+    if (d.pa)    document.getElementById('exam-pa').value  = d.pa;
+    if (d.cns)   document.getElementById('exam-cns').value = d.cns;
+
+    // Labs ✅
+    if (d.hb)    document.getElementById('lab-hb').value    = d.hb;
+    if (d.tc)    document.getElementById('lab-tc').value    = d.tc;
+    if (d.plt)   document.getElementById('lab-plt').value   = d.plt;
+    if (d.inr)   document.getElementById('lab-inr').value   = d.inr;
+    if (d.rbs)   document.getElementById('lab-rbs').value   = d.rbs;
+    if (d.tsh)   document.getElementById('lab-tsh').value   = d.tsh;
+    if (d.creat) document.getElementById('lab-creat').value = d.creat;
+    if (d.sgpt)  document.getElementById('lab-sgpt').value  = d.sgpt;
+    if (d.hba1c) document.getElementById('lab-hba1c').value = d.hba1c;
+    if (d.aptt)  document.getElementById('lab-aptt').value  = d.aptt;
+    if (d.pt)    document.getElementById('lab-pt').value    = d.pt;
+    if (d.urine) document.getElementById('lab-urine').value = d.urine;
+
+    // Reports (textareas) ✅
+    if (d.ecg)  document.getElementById('lab-ecg').value  = d.ecg;
+    if (d.echo) document.getElementById('lab-echo').value = d.echo;
+    if (d.cxr)  document.getElementById('lab-cxr').value  = d.cxr;
+
+    // KCO pills ✅
+    if (d.kco) {
+        document.querySelectorAll('.kco-check').forEach(cb => {
+            cb.checked = d.kco.includes(cb.value);
+            if (cb.checked) cb.parentElement.classList.add('active');
+            else cb.parentElement.classList.remove('active');
+        });
+    }
+    if (d.kcoOther !== undefined) document.getElementById('kco-other').value = d.kcoOther;
+
+    // Status pills ✅
+    if (d.docsNotAvail !== undefined)   document.getElementById('docs-not-avail').checked  = d.docsNotAvail;
+    if (d.medsNotBrought !== undefined) document.getElementById('meds-not-brought').checked = d.medsNotBrought;
+    document.getElementById('on-tt').checked  = d.onTT !== false;
+    document.getElementById('off-tt').checked = d.onTT === false;
+
+    // Advice box ✅
+    if (d.adviceHtml) document.getElementById('advice-box').innerHTML = d.adviceHtml;
 }
 
 // ==========================================
