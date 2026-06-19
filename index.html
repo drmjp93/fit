@@ -331,7 +331,7 @@
           <div class="compact-lab" style="grid-column: span 2;"><label>Plt</label><input type="text" id="lab-plt" class="arrow-nav-lab"></div>
           
           <div class="compact-lab" style="grid-column: span 2;"><label>INR</label><input type="text" id="lab-inr" class="arrow-nav-lab"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>RBS</label><input type="text" id="lab-rbs" class="arrow-nav-lab" oninput="generateAdvice()"></div>
+          <div class="compact-lab" style="grid-column: span 2;"><label>RBS</label><input type="text" id="lab-rbs" class="arrow-nav-lab" oninput="this.value = this.value.toUpperCase(); generateAdvice()"></div>
           <div class="compact-lab" style="grid-column: span 2;"><label>TSH</label><input type="text" id="lab-tsh" class="arrow-nav-lab" oninput="generateAdvice()"></div>
 
           <div class="compact-lab" style="grid-column: span 2;"><label>S.Creat</label><input type="text" id="lab-creat" class="arrow-nav-lab"></div>
@@ -1036,24 +1036,41 @@ async function loadFromCloudClipboard() {
 }
 
   // ══════════════════════════════════════════
-// LOCAL MEMORY BANK (RECENT 5 DRAFTS)
+// CLOUD DRAFTS BANK (UP TO 15 PATIENTS, SYNCED ACROSS PCs)
 // ══════════════════════════════════════════
 
-// 1. This runs as soon as the page opens to load your saved list
+let cloudDraftsCache = []; // last fetched list, used by loadFitnessDraft()
+
+// 1. This runs as soon as the page opens to load the saved list from the cloud
 document.addEventListener("DOMContentLoaded", updateDraftDropdown);
 
-function updateDraftDropdown() {
+async function fetchCloudDrafts() {
+    try {
+        const res = await fetch(`${CLOUD_API_URL}/?action=load_drafts`);
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+    } catch (e) {
+        return cloudDraftsCache || [];
+    }
+}
+
+async function postCloudDrafts(drafts) {
+    await fetch(`${CLOUD_API_URL}/?action=save_drafts`, {
+        method: "POST",
+        body: JSON.stringify(drafts)
+    });
+}
+
+async function updateDraftDropdown() {
     const select = document.getElementById('draft-selector');
     if (!select) return;
-    
-    // Clear the dropdown and add the default option
+
+    select.innerHTML = '<option value="">-- Loading from cloud... --</option>';
+
+    cloudDraftsCache = await fetchCloudDrafts();
+
     select.innerHTML = '<option value="">-- Select a recent patient --</option>';
-    
-    // Get the list from the computer's memory
-    const drafts = JSON.parse(localStorage.getItem('fitness_drafts') || '[]');
-    
-    // Add each patient to the dropdown menu
-    drafts.forEach((d, index) => {
+    cloudDraftsCache.forEach((d, index) => {
         let opt = document.createElement('option');
         opt.value = index;
         opt.innerText = d.label;
@@ -1061,7 +1078,7 @@ function updateDraftDropdown() {
     });
 }
 
-function saveFitnessDraft() {
+async function saveFitnessDraft() {
     const nameBox = document.getElementById('pt-name');
     const ptName = nameBox && nameBox.value ? nameBox.value : 'Unknown Patient';
     const today = new Date().toLocaleDateString('en-GB');
@@ -1111,21 +1128,22 @@ function saveFitnessDraft() {
         adviceHtml: document.getElementById('advice-box')?.innerHTML || ''
     };
 
-    let drafts = JSON.parse(localStorage.getItem('fitness_drafts') || '[]');
+    let drafts = await fetchCloudDrafts();
     drafts = drafts.filter(d => d.name !== ptName);
     drafts.unshift({ label: draftLabel, name: ptName, data: dataToSave });
-    if (drafts.length > 5) drafts.pop();
-    localStorage.setItem('fitness_drafts', JSON.stringify(drafts));
-    updateDraftDropdown();
-    alert("✓ Draft successfully saved to this computer!");
+    if (drafts.length > 15) drafts = drafts.slice(0, 15);
+    await postCloudDrafts(drafts);
+    cloudDraftsCache = drafts;
+    await updateDraftDropdown();
+    alert("✓ Draft saved to the cloud — fetchable from any PC!");
 }
 
-function loadFitnessDraft() {
+async function loadFitnessDraft() {
     const select = document.getElementById('draft-selector');
     const selectedIndex = select.value;
     if (selectedIndex === "") { alert("Please select a patient from the dropdown menu first."); return; }
 
-    const drafts = JSON.parse(localStorage.getItem('fitness_drafts') || '[]');
+    const drafts = await fetchCloudDrafts(); // always pull fresh, in case another PC saved since page load
     const patient = drafts[selectedIndex];
     if (!patient) return;
     const d = patient.data;
