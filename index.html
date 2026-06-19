@@ -204,13 +204,11 @@
 
     <strong style="font-size: 11px; color: #854d0e; white-space: nowrap;">DRAFTS:</strong>
     
-    <select id="draft-selector" style="padding: 2px; font-size: 11px; flex-grow: 1; min-width: 120px; border: 1px solid #ca8a04; border-radius: 3px;">
-        <option value="">-- SELECT PATIENT --</option>
-    </select>
-    
-    <button type="button" onclick="saveFitnessDraft()" style="background: #eab308; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; white-space: nowrap;">💾 SAVE</button>
-    
-    <button type="button" onclick="loadFitnessDraft()" style="background: white; color: #ca8a04; border: 1px solid #ca8a04; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; white-space: nowrap;">📂 LOAD</button>
+    <select id="draft-selector" onchange="loadFitnessDraft()" style="padding: 2px; font-size: 11px; flex-grow: 1; min-width: 120px; border: 1px solid #ca8a04; border-radius: 3px;">
+    <option value="">-- SELECT PATIENT --</option>
+</select>
+
+<button type="button" onclick="saveFitnessDraft()" style="background: #eab308; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; white-space: nowrap;">💾 SAVE</button>
 </div>
    
       <div class="grid-4">
@@ -1141,7 +1139,7 @@ async function saveFitnessDraft() {
 async function loadFitnessDraft() {
     const select = document.getElementById('draft-selector');
     const selectedIndex = select.value;
-    if (selectedIndex === "") { alert("Please select a patient from the dropdown menu first."); return; }
+    if (selectedIndex === "") { return; }
 
     const drafts = await fetchCloudDrafts(); // always pull fresh, in case another PC saved since page load
     const patient = drafts[selectedIndex];
