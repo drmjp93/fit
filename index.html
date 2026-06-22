@@ -175,7 +175,7 @@
   </style>
 </head>
 <body>
-
+<div id="lab-alert-banner" style="position:fixed; top:0; left:0; right:0; z-index:999999; display:none; padding:10px 16px; text-align:center; font-weight:900; font-size:0.95rem; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,.3);"></div>
 <div id="auth-screen" onclick="document.getElementById('mobile-pin').focus()">
   <input type="password" inputmode="numeric" id="mobile-pin" autofocus style="position: absolute; opacity: 0; z-index: -1;">
   
@@ -1205,6 +1205,58 @@ async function loadFitnessDraft() {
     if (d.adviceHtml) document.getElementById('advice-box').innerHTML = d.adviceHtml;
 }
 
+// LAB RANGE ALERT BANNER
+const LAB_RANGES = {
+  'lab-hb':    { low: 10,  high: 16,   name: 'Hb',    unit: 'g/dL' },
+  'lab-tc':    { low: 4000, high: 11000, name: 'TC',   unit: '/mm³' },
+  'lab-plt':   { low: 150000, high: 450000, name: 'Platelet', unit: '/mm³' },
+  'lab-inr':   { low: 0.8, high: 1.3,  name: 'INR',   unit: '' },
+  'lab-rbs':   { low: 70,  high: 140,  name: 'RBS',   unit: 'mg/dL' },
+  'lab-tsh':   { low: 0.4, high: 5.0,  name: 'TSH',   unit: 'µIU/mL' },
+  'lab-creat': { low: 0.6, high: 1.4,  name: 'S.Creat', unit: 'mg/dL' },
+  'lab-sgpt':  { low: 7,   high: 56,   name: 'SGPT',  unit: 'U/L' },
+  'lab-hba1c': { low: 4,   high: 5.6,  name: 'HBa1c', unit: '%' },
+  'lab-aptt':  { low: 25,  high: 35,   name: 'APTT',  unit: 'sec' },
+  'lab-pt':    { low: 11,  high: 13.5, name: 'PT',    unit: 'sec' }
+};
+
+Object.keys(LAB_RANGES).forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('input', () => checkLabAlert(el, id));
+  } else {
+    console.warn('Lab alert: element not found ->', id);
+  }
+});
+
+
+const activeLabAlerts = {};
+
+function checkLabAlert(inputEl, rangeKey) {
+  const banner = document.getElementById('lab-alert-banner');
+  const range = LAB_RANGES[rangeKey];
+  const raw = inputEl.value.replace(/,/g, '');
+  const val = parseFloat(raw);
+
+  if (!range || isNaN(val)) {
+    delete activeLabAlerts[rangeKey];
+  } else if (val < range.low) {
+    activeLabAlerts[rangeKey] = `⚠ LOW ${range.name}: ${inputEl.value} ${range.unit} (Normal: ${range.low}-${range.high})`;
+  } else if (val > range.high) {
+    activeLabAlerts[rangeKey] = `⚠ HIGH ${range.name}: ${inputEl.value} ${range.unit} (Normal: ${range.low}-${range.high})`;
+  } else {
+    delete activeLabAlerts[rangeKey];
+  }
+
+  const messages = Object.values(activeLabAlerts);
+  if (messages.length) {
+    banner.style.background = '#dc2626';
+    banner.innerHTML = messages.join(' &nbsp;|&nbsp; ');
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+}
 // ==========================================
   // PLATELET SMART AUTO-FORMATTER & VISUAL FEEDBACK
   // ==========================================
@@ -1244,9 +1296,41 @@ async function loadFitnessDraft() {
       this.style.color = '';
       this.style.fontWeight = 'normal';
     }
+    checkLabAlert(this, 'lab-plt');
   });
 
+// ==========================================
+// TC SMART AUTO-FORMATTER & VISUAL FEEDBACK
+// ==========================================
+document.getElementById('lab-tc').addEventListener('input', function (e) {
+  let raw = this.value.replace(/,/g, '');
+  let numValue = parseInt(raw, 10);
+  let labelEl = this.previousElementSibling;
 
+  labelEl.style.flexDirection = 'column';
+  labelEl.style.lineHeight = '1';
+  labelEl.style.padding = '4px 2px';
+
+  if (/^\d+$/.test(raw)) {
+    this.value = Number(raw).toLocaleString('en-IN');
+    let k = parseFloat((numValue / 1000).toFixed(1));
+
+    if (numValue < 4000 || numValue > 11000) {
+      labelEl.innerHTML = `TC<br><span style="font-size:0.65rem; color:#dc2626; font-weight:900; margin-top:3px;">${k} K</span>`;
+      this.style.color = '#dc2626';
+    } else {
+      labelEl.innerHTML = `TC<br><span style="font-size:0.65rem; color:#15803d; font-weight:900; margin-top:3px;">${k} K</span>`;
+      this.style.color = '';
+    }
+    this.style.fontWeight = 'bold';
+  } else {
+    labelEl.innerHTML = `TC`;
+    this.style.color = '';
+    this.style.fontWeight = 'normal';
+  }
+
+  checkLabAlert(this, 'lab-tc');
+});
 
 // ═══════════════════════════════════════════
 // STATS PING ENGINE  (FITNESS PAGE)
