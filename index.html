@@ -881,6 +881,12 @@ function generateAdvice() {
     }
   });
 
+  // Reset lab alert banner
+  for (const key in activeLabAlerts) delete activeLabAlerts[key];
+  document.getElementById('lab-alert-banner').style.display = 'none';
+
+
+
   // 6. Reset radio buttons
   document.getElementById('on-tt').checked = true;
 
