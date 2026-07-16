@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,178 +8,149 @@
   <style>
     :root { --bg: #f8fafc; --border: #cbd5e1; --accent: #0284c7; --pill-bg: #e0f2fe; --pill-text: #0369a1; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); padding: 20px; color: #334155; overflow: hidden; } /* Prevents scrolling while locked */
+    body { background: var(--bg); padding: 20px; color: #334155; overflow: hidden; }
 
-    /* =========================================
-       MACOS-STYLE INVISIBLE LOCK SCREEN
-       ========================================= */
-    #auth-screen { 
-      position: fixed; inset: 0; z-index: 9999;
-      background: radial-gradient(circle at top right, #334155, #0f172a);
-      display: flex; justify-content: center; align-items: center;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-    .mac-lock-box {
-      text-align: center; padding: 30px;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-    }
-    .mac-avatar {
-      width: 75px; height: 75px; margin: 0 auto 15px; border-radius: 50%;
-      background: linear-gradient(135deg, #38bdf8, #0284c7);
-      display: flex; justify-content: center; align-items: center;
-      font-size: 1.8rem; font-weight: 600; color: white;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    }
-    .mac-lock-box h2 { color: #f8fafc; font-size: 1.2rem; margin-bottom: 5px; border: none; letter-spacing: 0.5px; }
-    .mac-subtitle { color: #94a3b8; font-size: 0.85rem; }
+```
+#auth-screen { 
+  position: fixed; inset: 0; z-index: 9999;
+  background: radial-gradient(circle at top right, #334155, #0f172a);
+  display: flex; justify-content: center; align-items: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+.mac-lock-box {
+  text-align: center; padding: 30px;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+.mac-avatar {
+  width: 75px; height: 75px; margin: 0 auto 15px; border-radius: 50%;
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  display: flex; justify-content: center; align-items: center;
+  font-size: 1.8rem; font-weight: 600; color: white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+.mac-lock-box h2 { color: #f8fafc; font-size: 1.2rem; margin-bottom: 5px; border: none; letter-spacing: 0.5px; }
+.mac-subtitle { color: #94a3b8; font-size: 0.85rem; }
 
-    /* macOS Animations */
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
-    }
-    .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-    .unlock-fade { opacity: 0; visibility: hidden; }
-    .unlock-scale { transform: scale(1.15); opacity: 0; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+.unlock-fade { opacity: 0; visibility: hidden; }
+.unlock-scale { transform: scale(1.15); opacity: 0; }
 
-    /* clear button */
-    .btn-clear {
-      background: #e2e8f0;
-      color: #1e293b;
-      border: none;
-      padding: 12px 20px;
-      font-size: 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      width: 100%;
-      margin-bottom: 10px;
-      transition: 0.2s;
-    }
+.btn-clear {
+  background: #e2e8f0; color: #1e293b; border: none; padding: 12px 20px;
+  font-size: 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;
+  width: 100%; margin-bottom: 10px; transition: 0.2s;
+}
+.btn-clear:hover { background: #cbd5e1; }
 
-    .btn-clear:hover {
-      background: #cbd5e1;
-    }
+.status-pill { display: inline-block; cursor: pointer; user-select: none; }
+.status-pill input { display: none; }
+.pill-text { 
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+  border: 1px solid var(--border); background: #f8fafc; color: #64748b;
+  transition: all 0.2s ease; white-space: nowrap;
+}
+.status-pill:hover .pill-text { border-color: #94a3b8; }
+.status-pill input:checked + .warn-text { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+.status-pill input:checked + .success-text { background: #dcfce7; border-color: #22c55e; color: #166534; }
 
-/* Compact Lab Textareas (ECG, ECHO, CXR) */
-    .compact-lab textarea.auto-wrap {
-      border: none;
-      padding: 6px;
-      font-size: 0.85rem;
-      width: 100%;
-      border-radius: 0;
-      outline: none;
-      resize: none; /* Disables manual dragging */
-      margin-bottom: 0;
-      line-height: 1.4;
-      overflow: hidden;
-      font-family: inherit;
-    }
-    .compact-lab textarea.auto-wrap:focus {
-      background: #f0f9ff;
-    }
+.main-wrapper { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; align-items: flex-start; }
+.left-pane { flex: 2; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+.right-pane { flex: 1; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); position: sticky; top: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); }
 
-/* Ultra-Compact Status Pills */
-    .status-pill { display: inline-block; cursor: pointer; user-select: none; }
-    .status-pill input { display: none; }
-    .pill-text { 
-      display: flex; align-items: center; justify-content: center;
-      padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
-      border: 1px solid var(--border); background: #f8fafc; color: #64748b;
-      transition: all 0.2s ease; white-space: nowrap;
-    }
-    .status-pill:hover .pill-text { border-color: #94a3b8; }
-    
-    /* Checked States */
-    .status-pill input:checked + .warn-text { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
-    .status-pill input:checked + .success-text { background: #dcfce7; border-color: #22c55e; color: #166534; }
-    
-    /* =========================================
-       MAIN APPLICATION UI
-       ========================================= */
-    .main-wrapper { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; align-items: flex-start; }
-    .left-pane { flex: 2; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-    .right-pane { flex: 1; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); position: sticky; top: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); }
+h2, h3 { color: var(--accent); margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; }
+.section { margin-bottom: 25px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fafafa; }
 
-    h2, h3 { color: var(--accent); margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; }
-    .section { margin-bottom: 25px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fafafa; }
-    
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-    .compact-lab { display: flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-    .compact-lab label { background: #f1f5f9; padding: 6px 4px; margin: 0; font-size: 0.75rem; border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; min-width: 45px; font-weight: bold; color: #475569;}
-    .compact-lab input { border: none; padding: 6px; font-size: 0.85rem; width: 100%; border-radius: 0; outline: none; }
-    .compact-lab input:focus { background: #f0f9ff; }
-    .input-group { display: flex; flex-direction: column; }
-    label { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
-    input[type="text"], input[type="number"], input[type="date"], select, textarea { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.95rem; }
-    
-    textarea { flex-grow: 1; resize: none; font-size: 0.95rem; padding: 12px; line-height: 1.5; margin-bottom: 15px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.compact-lab { display: flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.compact-lab label { background: #f1f5f9; padding: 6px 4px; margin: 0; font-size: 0.75rem; border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; min-width: 45px; font-weight: bold; color: #475569;}
+.compact-lab input { border: none; padding: 6px; font-size: 0.85rem; width: 100%; border-radius: 0; outline: none; }
+.compact-lab input:focus { background: #f0f9ff; }
+.input-group { display: flex; flex-direction: column; }
+label { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+input[type="text"], input[type="number"], input[type="date"], select, textarea { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.95rem; }
+textarea { flex-grow: 1; resize: none; font-size: 0.95rem; padding: 12px; line-height: 1.5; margin-bottom: 15px; }
 
-    .pill-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
-    .kco-pill { display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; user-select: none; transition: 0.2s; }
-    .kco-pill input { display: none; }
-    .kco-pill.active { background: var(--pill-bg); border-color: var(--accent); color: var(--pill-text); font-weight: bold; }
-    .exam-pill { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; margin-left: 5px; }
-    .exam-pill:hover { background: #fca5a5; }
+.pill-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+.kco-pill { display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; user-select: none; transition: 0.2s; }
+.kco-pill input { display: none; }
+.kco-pill.active { background: var(--pill-bg); border-color: var(--accent); color: var(--pill-text); font-weight: bold; }
+.exam-pill { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; margin-left: 5px; }
+.exam-pill:hover { background: #fca5a5; }
 
-    .btn-print { background: var(--accent); color: white; border: none; padding: 15px 20px; font-size: 1.1rem; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
-    .btn-print:hover { background: #0369a1; }
+.btn-print { background: var(--accent); color: white; border: none; padding: 15px 20px; font-size: 1.1rem; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+.btn-print:hover { background: #0369a1; }
 
-    #print-area { display: none; }
+#print-area { display: none; }
 
-    /* =========================================
-       PRINT CSS (3cm Letterhead Margin)
-       ========================================= */
+/* REF PANEL STYLES */
+#ref-btn {
+  background: #f1f5f9; border: 1px solid #94a3b8; padding: 8px 14px;
+  border-radius: 5px; cursor: pointer; font-size: 0.82rem; margin-bottom: 8px;
+  width: 100%; text-align: left; color: #334155; font-weight: 600;
+}
+#ref-btn:hover { background: #e2e8f0; }
+#ref-panel {
+  display: none;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-size: 0.78rem;
+  line-height: 1.85;
+  max-height: 340px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  user-select: text;
+}
+#ref-panel b { color: #0369a1; display: block; margin-top: 10px; margin-bottom: 2px; font-size: 0.80rem; }
+#ref-panel b:first-child { margin-top: 0; }
 
-    @media print {
-      @page { size: A4; margin: 0mm 15mm 15mm 15mm; }
-      
-      body { 
-        background: white; padding: 0; 
-        font-size: 13px; color: #000; 
-        line-height: 1.3; overflow: auto; 
-        margin: 0 !important; /* Force reset */
-      }
+/* =========================================
+   PRINT CSS
+   ========================================= */
+@media print {
+  @page { size: A4; margin: 0mm 15mm 15mm 15mm; }
+  body { background: white; padding: 0; font-size: 13px; color: #000; line-height: 1.3; overflow: auto; margin: 0 !important; }
+  #auth-screen, .main-wrapper { display: none !important; }
+  #ref-btn, #ref-panel { display: none !important; }
+  #print-area { 
+    display: block !important; 
+    padding-top: 35mm !important;
+    padding-left: 15mm !important;
+    padding-right: 15mm !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .print-header { text-align: center; margin-bottom: 15px; }
+  .print-header h1 { font-size: 1.4rem; color: #000; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px; display: inline-block; }
+  .print-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .print-section { margin-bottom: 12px; }
+  .print-section h4 { text-decoration: underline; margin-bottom: 4px; font-size: 1.05rem; color: #000; }
+  .lab-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.9rem; }
+  .lab-table th, .lab-table td { border: 1px solid #000; padding: 5px; text-align: left; }
+  .lab-table th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; width: 15%; font-weight: bold; }
+  .lab-table td { width: 35%; }
+  #p-advice { line-height: 1.5; margin-top: 5px; }
+  .signature-block { margin-top: 40px; text-align: right; }
+  .signature-block p { margin-bottom: 2px; }
+}
+```
 
-      #auth-screen, .main-wrapper { display: none !important; }
-      
-   #print-area { 
-        display: block !important; 
-        padding-top: 35mm !important; /* 3cm header + 5mm breathing room */
-        padding-left: 15mm !important;
-        padding-right: 15mm !important;
-        width: 100%;
-        box-sizing: border-box;
-      }
-      
-      .print-header { text-align: center; margin-bottom: 15px; }
-      .print-header h1 { font-size: 1.4rem; color: #000; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px; display: inline-block; }
-      
-      .print-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-      .print-section { margin-bottom: 12px; }
-      .print-section h4 { text-decoration: underline; margin-bottom: 4px; font-size: 1.05rem; color: #000; }
-      
-      .lab-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.9rem; }
-      .lab-table th, .lab-table td { border: 1px solid #000; padding: 5px; text-align: left; }
-      .lab-table th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; width: 15%; font-weight: bold; }
-      .lab-table td { width: 35%; }
-      
-      #p-advice { line-height: 1.5; margin-top: 5px; }
-      
-      .signature-block { margin-top: 40px; text-align: right; }
-      .signature-block p { margin-bottom: 2px; }
-    }
   </style>
 </head>
 <body>
-<div id="lab-alert-banner" style="position:fixed; top:0; left:0; right:0; z-index:999999; display:none; padding:10px 16px; text-align:center; font-weight:900; font-size:0.95rem; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,.3);"></div>
+
 <div id="auth-screen" onclick="document.getElementById('mobile-pin').focus()">
   <input type="password" inputmode="numeric" id="mobile-pin" autofocus style="position: absolute; opacity: 0; z-index: -1;">
-  
   <div class="mac-lock-box" id="mac-lock-box">
     <div class="mac-avatar">MP</div>
     <h2>Dr. Mit Panchani</h2>
@@ -186,416 +158,197 @@
   </div>
 </div>
 
-
 <div class="main-wrapper">
   <div class="left-pane">
     <h2>Pre-Op Physician Fitness Form</h2>
 
- <div class="section">
-   
-  <div style="display: flex; gap: 8px; align-items: center; background: #fef08a; padding: 6px 10px; border-radius: 4px; flex-wrap: nowrap; overflow-x: auto;">
-    
-    <div style="display: flex; gap: 4px; flex-shrink: 0;">
-        <button type="button" onclick="saveToCloudClipboard()" style="background: #dbeafe; color: #1d4ed8; padding: 4px 8px; border: 1px solid #bfdbfe; border-radius: 4px; font-weight: bold; font-size: 10px; text-transform: uppercase; cursor: pointer;">↑ SEND</button>
-        <button type="button" onclick="loadFromCloudClipboard()" style="background: #dcfce7; color: #15803d; padding: 4px 8px; border: 1px solid #bbf7d0; border-radius: 4px; font-weight: bold; font-size: 10px; text-transform: uppercase; cursor: pointer;">↓ FETCH</button>
+```
+<div class="section">
+  <div class="grid-4">
+    <div class="input-group"><label>Date</label><input type="date" id="pt-date"></div>
+    <div class="input-group"><label>Gender</label>
+      <select id="pt-gender"><option>MALE</option><option>FEMALE</option><option>OTHER</option></select>
     </div>
-
-    <div style="border-left: 1px solid #ca8a04; height: 20px; margin: 0 4px;"></div>
-
-    <strong style="font-size: 11px; color: #854d0e; white-space: nowrap;">DRAFTS:</strong>
-    
-    <select id="draft-selector" onchange="loadFitnessDraft()" style="padding: 2px; font-size: 11px; flex-grow: 1; min-width: 120px; border: 1px solid #ca8a04; border-radius: 3px;">
-    <option value="">-- SELECT PATIENT --</option>
-</select>
-
-<button type="button" onclick="saveFitnessDraft()" style="background: #eab308; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; white-space: nowrap;">💾 SAVE</button>
+    <div class="input-group"><label>Patient Name</label><input type="text" id="pt-name" oninput="this.value = this.value.toUpperCase()"></div>
+    <div class="input-group"><label>Age</label><input type="number" id="pt-age"></div>
+  </div>
+  <div class="input-group" style="margin-top: 15px;">
+    <label>Planned Procedure / OT Name</label>
+    <input type="text" id="pt-ot" placeholder="E.G. LAPAROSCOPIC CHOLECYSTECTOMY" oninput="this.value = this.value.toUpperCase()">
+  </div>
 </div>
-   
-      <div class="grid-4">
-        <div class="input-group"><label>Date</label><input type="date" id="pt-date"></div>
-        <div class="input-group"><label>Gender</label>
-          <select id="pt-gender"><option>MALE</option><option>FEMALE</option><option>OTHER</option></select>
-        </div>
-        <div class="input-group"><label>Patient Name</label><input type="text" id="pt-name" oninput="this.value = this.value.toUpperCase()"></div>
-        <div class="input-group"><label>Age</label><input type="number" id="pt-age"></div>
-      </div>
-      <div class="input-group" style="margin-top: 15px;">
-        <label>Planned Procedure / OT Name</label>
-        <input type="text" id="pt-ot" placeholder="E.G. LAPAROSCOPIC CHOLECYSTECTOMY" oninput="this.value = this.value.toUpperCase()">
-      </div>
-    </div>
-
-    <div class="section">
-      <h3>Known Case Of (KCO)</h3>
-      <div class="pill-container" id="kco-container">
-        <label class="kco-pill"><input type="checkbox" value="DM" class="kco-check" onchange="togglePill(this)"> DM</label>
-        <label class="kco-pill"><input type="checkbox" value="HTN" class="kco-check" onchange="togglePill(this)"> HTN</label>
-        <label class="kco-pill"><input type="checkbox" value="IHD" class="kco-check" onchange="togglePill(this)"> IHD</label>
-        <label class="kco-pill"><input type="checkbox" value="Asthma" class="kco-check" onchange="togglePill(this)"> Asthma</label>
-        <label class="kco-pill"><input type="checkbox" value="COPD" class="kco-check" onchange="togglePill(this)"> COPD</label>
-        <label class="kco-pill"><input type="checkbox" value="Thyroid Disorder" class="kco-check" onchange="togglePill(this)"> Thyroid Disorder</label>
-        <label class="kco-pill"><input type="checkbox" value="Hyperthyroid" class="kco-check" onchange="togglePill(this)"> Hyperthyroid</label>
-        <label class="kco-pill"><input type="checkbox" value="Hypothyroid" class="kco-check" onchange="togglePill(this)"> Hypothyroid</label>
-        <label class="kco-pill"><input type="checkbox" value="CKD" class="kco-check" onchange="togglePill(this)"> CKD</label>
-        <label class="kco-pill"><input type="checkbox" value="Epilepsy" class="kco-check" onchange="togglePill(this)"> Epilepsy</label>
-        <label class="kco-pill"><input type="checkbox" value="S/P CABG" class="kco-check" onchange="togglePill(this)"> S/P CABG</label>
-        <label class="kco-pill"><input type="checkbox" value="S/P PTCA" class="kco-check" onchange="togglePill(this)"> S/P PTCA</label>
-        <label class="kco-pill"><input type="checkbox" value="Chronic Steroids" class="kco-check" onchange="togglePill(this)"> Chronic Steroids</label>
-        <label class="kco-pill"><input type="checkbox" value="OSA" class="kco-check" onchange="togglePill(this)"> OSA</label>
-        <label class="kco-pill"><input type="checkbox" value="Psychiatry" class="kco-check" onchange="togglePill(this)"> Psychiatry</label>
-      </div>
-
-
-      <div class="grid-2" style="margin-top: 15px; align-items: end;">
-
-        <div class="input-group">
-          <label>Other Medical / Surgical History</label>
-          <input type="text" id="kco-other" placeholder="Any other past history" value="No PHO Surgery" style="margin-bottom: 0;" oninput="this.value = this.value.toUpperCase()">
-        </div>
-
-        <div class="input-group">
-          <label>Compliance & Status</label>
-          <div style="display: flex; gap: 8px; flex-wrap: nowrap; margin-top: 4px;">
-            
-            <label class="status-pill">
-              <input type="checkbox" id="docs-not-avail" onchange="saveDraft()"> 
-              <span class="pill-text warn-text">No Docs</span>
-            </label>
-            
-            <label class="status-pill">
-              <input type="checkbox" id="meds-not-brought"> 
-              <span class="pill-text warn-text">No Meds</span>
-            </label>
-            
-            <label class="status-pill">
-              <input type="radio" name="tt-status" id="on-tt" checked> 
-              <span class="pill-text success-text">T/T ✅</span>
-            </label>
-            
-            <label class="status-pill">
-              <input type="radio" name="tt-status" id="off-tt"> 
-              <span class="pill-text warn-text">T/T ❌</span>
-            </label>
-            
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-
 
 <div class="section">
-      <h3 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; margin-bottom: 15px;">
-        <span>Vitals, Examination & Labs</span>
-        <button type="button" onclick="clearInvestigationDefaults()" 
-            style="background: #fff; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: bold; color: #ef4444; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-            CLEAR LABS
-        </button>
-      </h3>
+  <h3>Known Case Of (KCO)</h3>
+  <div class="pill-container" id="kco-container">
+    <label class="kco-pill"><input type="checkbox" value="DM" class="kco-check" onchange="togglePill(this)"> DM</label>
+    <label class="kco-pill"><input type="checkbox" value="HTN" class="kco-check" onchange="togglePill(this)"> HTN</label>
+    <label class="kco-pill"><input type="checkbox" value="IHD" class="kco-check" onchange="togglePill(this)"> IHD</label>
+    <label class="kco-pill"><input type="checkbox" value="Asthma" class="kco-check" onchange="togglePill(this)"> Asthma</label>
+    <label class="kco-pill"><input type="checkbox" value="COPD" class="kco-check" onchange="togglePill(this)"> COPD</label>
+    <label class="kco-pill"><input type="checkbox" value="Thyroid Disorder" class="kco-check" onchange="togglePill(this)"> Thyroid Disorder</label>
+    <label class="kco-pill"><input type="checkbox" value="Hyperthyroid" class="kco-check" onchange="togglePill(this)"> Hyperthyroid</label>
+    <label class="kco-pill"><input type="checkbox" value="Hypothyroid" class="kco-check" onchange="togglePill(this)"> Hypothyroid</label>
+    <label class="kco-pill"><input type="checkbox" value="CKD" class="kco-check" onchange="togglePill(this)"> CKD</label>
+    <label class="kco-pill"><input type="checkbox" value="Epilepsy" class="kco-check" onchange="togglePill(this)"> Epilepsy</label>
+    <label class="kco-pill"><input type="checkbox" value="S/P CABG" class="kco-check" onchange="togglePill(this)"> S/P CABG</label>
+    <label class="kco-pill"><input type="checkbox" value="S/P PTCA" class="kco-check" onchange="togglePill(this)"> S/P PTCA</label>
+    <label class="kco-pill"><input type="checkbox" value="Chronic Steroids" class="kco-check" onchange="togglePill(this)"> Chronic Steroids</label>
+    <label class="kco-pill"><input type="checkbox" value="OSA" class="kco-check" onchange="togglePill(this)"> OSA</label>
+    <label class="kco-pill"><input type="checkbox" value="Psychiatry" class="kco-check" onchange="togglePill(this)"> Psychiatry</label>
+  </div>
 
-      <div style="display: grid; grid-template-columns: 140px 1.2fr 1.6fr; gap: 20px;">
-        
-        <div style="display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #e2e8f0; padding-right: 15px;">
-          <div class="input-group"><label>Temp</label><input type="text" id="v-temp" class="arrow-nav-left" value="Afebrile"></div>
-          <div class="input-group"><label>Pulse</label><input type="text" id="v-pr" class="arrow-nav-left" placeholder="bpm"></div>
-          <div class="input-group"><label>Resp</label><input type="text" id="v-rr" class="arrow-nav-left" placeholder="cpm"></div>
-          <div class="input-group"><label>BP</label><input type="text" id="v-bp" class="arrow-nav-left" placeholder="mmHg"></div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #e2e8f0; padding-right: 15px;">
-          <div class="input-group">
-            <label>RS <span class="exam-pill" onclick="appendExam('exam-rs', 'B/L Ronchi')">+ Ronchi</span> <span class="exam-pill" onclick="appendExam('exam-rs', 'B/L Creps')">+ Creps</span></label>
-            <input type="text" id="exam-rs" class="arrow-nav-right" value="BSBE, clear">
-          </div>
-          <div class="input-group">
-            <label>CVS <span class="exam-pill" onclick="appendExam('exam-cvs', 'Murmur +')">+ Murmur</span></label>
-            <input type="text" id="exam-cvs" class="arrow-nav-right" value="S1S2+, no murmur">
-          </div>
-          <div class="input-group"><label>CNS</label><input type="text" id="exam-cns" class="arrow-nav-right" value="Conscious, orientated"></div>
-          <div class="input-group">
-            <label>P/A <span class="exam-pill" onclick="appendExam('exam-pa', 'Guarding +')">+ Guarding</span> <span class="exam-pill" onclick="appendExam('exam-pa', 'Rigidity +')">+ Rigidity</span></label>
-            <input type="text" id="exam-pa" class="arrow-nav-right" value="Soft and NT">
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; align-content: start;">
-          <div class="compact-lab" style="grid-column: span 2;"><label>Hb</label><input type="text" id="lab-hb" class="arrow-nav-lab" oninput="generateAdvice()"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>TC</label><input type="text" id="lab-tc" class="arrow-nav-lab"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>Plt</label><input type="text" id="lab-plt" class="arrow-nav-lab"></div>
-          
-          <div class="compact-lab" style="grid-column: span 2;"><label>INR</label><input type="text" id="lab-inr" class="arrow-nav-lab"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>RBS</label><input type="text" id="lab-rbs" class="arrow-nav-lab" oninput="this.value = this.value.toUpperCase(); generateAdvice()"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>TSH</label><input type="text" id="lab-tsh" class="arrow-nav-lab" oninput="generateAdvice()"></div>
-
-          <div class="compact-lab" style="grid-column: span 2;"><label>S.Creat</label><input type="text" id="lab-creat" class="arrow-nav-lab"></div>
-          
-          <div class="compact-lab" style="grid-column: span 2;"><label>SGPT</label><input type="text" id="lab-sgpt" class="arrow-nav-lab"></div>
-
-          <div class="compact-lab" style="grid-column: span 2;"><label>HBa1c</label><input type="text" id="lab-hba1c" class="arrow-nav-lab"></div>
-          
-          <div class="compact-lab" style="grid-column: span 2;"><label>APTT</label><input type="text" id="lab-aptt" class="arrow-nav-lab"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>PT</label><input type="text" id="lab-pt" class="arrow-nav-lab"></div>
-          <div class="compact-lab" style="grid-column: span 2;"><label>Urine</label><input type="text" id="lab-urine" class="arrow-nav-lab" value="Noted"></div>
-          
-          <div class="compact-lab" style="grid-column: span 3;"><label>ECG</label><textarea id="lab-ecg" class="auto-wrap" rows="1" oninput="this.value = this.value.toUpperCase()">WNL</textarea></div>
-          <div class="compact-lab" style="grid-column: span 3;"><label>ECHO</label><textarea id="lab-echo" class="auto-wrap" rows="1">Noted</textarea></div>
-          <div class="compact-lab" style="grid-column: span 3;"><label>CXR</label><textarea id="lab-cxr" class="auto-wrap" rows="1">Noted</textarea></div>
-         
-          <div class="compact-lab" style="grid-column: span 3;"><label>SpO2</label><input type="text" id="v-spo2" class="arrow-nav-lab" value="98% with RA"></div>
-        </div>
-
+  <div class="grid-2" style="margin-top: 15px; align-items: end;">
+    <div class="input-group">
+      <label>Other Medical / Surgical History</label>
+      <input type="text" id="kco-other" placeholder="Any other past history" value="No PHO Surgery" style="margin-bottom: 0;">
+    </div>
+    <div class="input-group">
+      <label>Compliance & Status</label>
+      <div style="display: flex; gap: 8px; flex-wrap: nowrap; margin-top: 4px;">
+        <label class="status-pill">
+          <input type="checkbox" id="docs-not-avail" onchange="saveDraft()"> 
+          <span class="pill-text warn-text">No Docs</span>
+        </label>
+        <label class="status-pill">
+          <input type="checkbox" id="meds-not-brought"> 
+          <span class="pill-text warn-text">No Meds</span>
+        </label>
+        <label class="status-pill">
+          <input type="radio" name="tt-status" id="on-tt" checked> 
+          <span class="pill-text success-text">T/T ✅</span>
+        </label>
+        <label class="status-pill">
+          <input type="radio" name="tt-status" id="off-tt"> 
+          <span class="pill-text warn-text">T/T ❌</span>
+        </label>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; margin-bottom: 15px;">
+    <span>Vitals, Examination & Labs</span>
+    <button type="button" onclick="clearInvestigationDefaults()" 
+        style="background: #fff; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: bold; color: #ef4444; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        CLEAR LABS
+    </button>
+  </h3>
+
+  <div style="display: grid; grid-template-columns: 140px 1.2fr 1.6fr; gap: 20px;">
+    
+    <div style="display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #e2e8f0; padding-right: 15px;">
+      <div class="input-group"><label>Temp</label><input type="text" id="v-temp" class="arrow-nav-left" value="Afebrile"></div>
+      <div class="input-group"><label>Pulse</label><input type="text" id="v-pr" class="arrow-nav-left" placeholder="bpm"></div>
+      <div class="input-group"><label>Resp</label><input type="text" id="v-rr" class="arrow-nav-left" placeholder="cpm"></div>
+      <div class="input-group"><label>BP</label><input type="text" id="v-bp" class="arrow-nav-left" placeholder="mmHg"></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #e2e8f0; padding-right: 15px;">
+      <div class="input-group">
+        <label>RS <span class="exam-pill" onclick="appendExam('exam-rs', 'B/L Ronchi')">+ Ronchi</span> <span class="exam-pill" onclick="appendExam('exam-rs', 'B/L Creps')">+ Creps</span></label>
+        <input type="text" id="exam-rs" class="arrow-nav-right" value="BSBE, clear">
+      </div>
+      <div class="input-group">
+        <label>CVS <span class="exam-pill" onclick="appendExam('exam-cvs', 'Murmur +')">+ Murmur</span></label>
+        <input type="text" id="exam-cvs" class="arrow-nav-right" value="S1S2+, no murmur">
+      </div>
+      <div class="input-group"><label>CNS</label><input type="text" id="exam-cns" class="arrow-nav-right" value="Conscious, orientated"></div>
+      <div class="input-group">
+        <label>P/A <span class="exam-pill" onclick="appendExam('exam-pa', 'Guarding +')">+ Guarding</span> <span class="exam-pill" onclick="appendExam('exam-pa', 'Rigidity +')">+ Rigidity</span></label>
+        <input type="text" id="exam-pa" class="arrow-nav-right" value="Soft and NT">
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; align-content: start;">
+      <div class="compact-lab" style="grid-column: span 2;"><label>Hb</label><input type="text" id="lab-hb" class="arrow-nav-lab"></div>
+      <div class="compact-lab" style="grid-column: span 2;"><label>TC</label><input type="text" id="lab-tc" class="arrow-nav-lab"></div>
+      <div class="compact-lab" style="grid-column: span 2;"><label>Plt</label><input type="text" id="lab-plt" class="arrow-nav-lab"></div>
+      
+      <div class="compact-lab" style="grid-column: span 2;"><label>RBS</label><input type="text" id="lab-rbs" class="arrow-nav-lab" oninput="this.value = this.value.toUpperCase(); generateAdvice()"></div>
+      <div class="compact-lab" style="grid-column: span 2;"><label>HBa1c</label><input type="text" id="lab-hba1c" class="arrow-nav-lab"></div>
+      <div class="compact-lab" style="grid-column: span 2;"><label>Cr</label><input type="text" id="lab-creat" class="arrow-nav-lab"></div>
+      
+      <div class="compact-lab" style="grid-column: span 2;"><label>SGPT</label><input type="text" id="lab-sgpt" class="arrow-nav-lab"></div>
+      <div class="compact-lab" style="grid-column: span 2;"><label>PT</label><input type="text" id="lab-pt" class="arrow-nav-lab"></div>
+      <div class="compact-lab" style="grid-column: span 2;"><label>INR</label><input type="text" id="lab-inr" class="arrow-nav-lab"></div>
+      
+      <div class="compact-lab" style="grid-column: span 2;"><label>APTT</label><input type="text" id="lab-aptt" class="arrow-nav-lab"></div>
+      <div class="compact-lab" style="grid-column: span 2;"><label>TSH</label><input type="text" id="lab-tsh" class="arrow-nav-lab"></div>
+      <div class="compact-lab" style="grid-column: span 2;"><label>Urine</label><input type="text" id="lab-urine" class="arrow-nav-lab" value="Noted"></div>
+      
+      <div class="compact-lab" style="grid-column: span 3;"><label>ECG</label><input type="text" id="lab-ecg" class="arrow-nav-lab" value="WNL"></div>
+      <div class="compact-lab" style="grid-column: span 3;"><label>ECHO</label><input type="text" id="lab-echo" class="arrow-nav-lab" value="Noted"></div>
+      
+      <div class="compact-lab" style="grid-column: span 3;"><label>CXR</label><input type="text" id="lab-cxr" class="arrow-nav-lab" value="Noted"></div>
+      <div class="compact-lab" style="grid-column: span 3;"><label>SpO2</label><input type="text" id="v-spo2" class="arrow-nav-lab" value="98% with RA"></div>
+    </div>
+
+  </div>
+</div>
+```
+
   </div>
 
   <div class="right-pane">
     <h3 style="margin-bottom: 5px;">Fitness Advice & Remarks</h3>
-    
-    <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
-      <label class="status-pill">
-        <input type="checkbox" id="chk-anesthetist" onchange="generateAdvice(); saveDraft();"> 
-        <span class="pill-text" style="padding: 4px 8px; font-size: 0.75rem;">🩺 Anesthetist Fitness Req.</span>
-      </label>
-      <label class="status-pill">
-        <input type="checkbox" id="chk-cont-meds" onchange="generateAdvice(); saveDraft();"> 
-        <span class="pill-text" style="padding: 4px 8px; font-size: 0.75rem;">💊 Continue Meds</span>
-      </label>
-    </div>
 
-    <div id="advice-box" contenteditable="true" style="flex-grow: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 12px; overflow-y: auto; background: #fff; line-height: 1.5; margin-bottom: 15px;"></div>
-    
-    <button class="btn-clear" onclick="clearForm()">🧹 Clear Form</button>
+```
+<div id="advice-box" contenteditable="true" style="flex-grow: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 12px; overflow-y: auto; background: #fff; line-height: 1.5; margin-bottom: 15px;"></div>
 
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px;">
-    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; font-size: 0.9rem; color: #166534; user-select: none;">
-        <input type="checkbox" id="fitnessLogPill" style="width: 18px; height: 18px; cursor: pointer; accent-color: #10b981;">
-        Log this certificate to Stats
-    </label>
-    <span style="font-size: 0.75rem; color: #64748b; font-style: italic;">Check if patient is receiving certificate today</span>
+<!-- REFERENCE GUIDE TOGGLE -->
+<button id="ref-btn" type="button" onclick="var p=document.getElementById('ref-panel'); p.style.display = p.style.display === 'none' ? 'block' : 'none'">
+  📋 Preop Reference Guide (click to toggle)
+</button>
+
+<div id="ref-panel">
+  <b>── HAEMOGLOBIN ──</b>
+  Hb ≥10: No contraindication. Monitor perioperative blood loss.<br>
+  Hb 8–10: Optimize if time permits. If urgent, proceed with blood availability and surgical/anesthesia discussion.<br>
+  Hb &lt;8: Correct before elective surgery unless urgent indication.
+
+  <b>── THYROID (TSH) ──</b>
+  TSH 5–10, FT4 normal (Subclinical): No contraindication. Start/adjust thyroid therapy, follow-up.<br>
+  TSH &gt;10, FT4 normal: Thyroid replacement advised. Clinically stable — may proceed if surgical urgency exists.<br>
+  Low FT4 / Overt hypothyroidism: Optimize before elective surgery. Defer unless urgent.
+
+  <b>── RENAL (Creatinine) ──</b>
+  Stable CKD (Cr 1.5–2.5): Proceed with renal precautions, avoid nephrotoxics, hydrate adequately.<br>
+  Acute rise / AKI: Evaluate and correct before elective surgery.<br>
+  Severe impairment: Nephrology review and optimization first.
+
+  <b>── LIVER (SGPT) ──</b>
+  Mild (&lt;3× ULN), normal bilirubin/INR: No contraindication. Evaluate cause, avoid hepatotoxics.<br>
+  Marked (&gt;5× ULN) / Acute hepatitis: Evaluate and stabilize before surgery.<br>
+  Liver failure (raised INR / jaundice / ascites): Defer elective surgery.
+
+  <b>── WBC ──</b>
+  11,000–15,000, clinically well, afebrile: No contraindication.<br>
+  &gt;15,000 or suspected infection: Treat infection before elective surgery.<br>
+  ANC &lt;1000 (Neutropenia): Evaluate and optimize — increased infection risk.
+
+  <b>── PLATELETS ──</b>
+  ≥1,00,000: No contraindication.<br>
+  75,000–1,00,000: Proceed with perioperative bleeding awareness and team planning.<br>
+  50,000–75,000: Evaluate cause. Individualize decision.<br>
+  &lt;50,000: Correct before elective major surgery.
+
+  <b>── STANDARD CLEAR LINE ──</b>
+  Patient evaluated medically. No active medical contraindication identified for planned elective surgery. Existing abnormalities assessed and optimization advised. Final surgical fitness to be considered jointly with operating surgeon and anesthesiologist.
+
+  <b>── DO NOT CLEAR / DEFER ──</b>
+  Active infection/sepsis &nbsp;·&nbsp; AKI &nbsp;·&nbsp; Decompensated heart failure &nbsp;·&nbsp; Uncontrolled arrhythmia &nbsp;·&nbsp; ACS &nbsp;·&nbsp; Severe symptomatic hypothyroidism &nbsp;·&nbsp; Acute hepatitis / liver failure &nbsp;·&nbsp; Severe anemia &nbsp;·&nbsp; Platelets &lt;50,000
 </div>
 
-    <button type="button" onclick="document.getElementById('ref-panel').style.display = document.getElementById('ref-panel').style.display === 'none' ? 'block' : 'none'"     style="background:#f1f5f9; border:1px solid #94a3b8; padding:8px 14px; border-radius:5px; cursor:pointer; font-size:0.85rem; margin-bottom:8px; width:100%;">📋 Reference Guide (Preop Fitness)</button>
+<button class="btn-clear" onclick="clearForm()">🧹 Clear Form</button>
+<button class="btn-print" onclick="preparePrint()">🖨️ Print Certificate</button>
+```
 
-    I have summarized the practical points into a **preoperative physician fitness note format** (especially applicable for elective major surgery such as hysterectomy for AUB). These are **templates**—modify according to the individual patient, urgency, surgeon/anesthetist assessment, and local protocols.
-
-# Preoperative Medical Fitness – Common Abnormal Investigation Scenarios
-
----
-
-## 1. Hemoglobin (Hb) / Anemia
-
-### Hb ≥10 g/dL
-
-**Assessment:**
-
-* Mild/no anemia or acceptable anemia.
-* Evaluate cause if low.
-
-**Fitness advice:**
-
-> "Patient has Hb ___ g/dL. No evidence of hemodynamic compromise or symptomatic anemia. From a physician's perspective, there is no medical contraindication for planned surgery. Recommend perioperative blood loss monitoring and appropriate management."
-
----
-
-### Hb 8–10 g/dL
-
-**Assessment:**
-
-* Anemia present.
-* Consider cause (AUB, iron deficiency, CKD, nutritional deficiency).
-* Optimize if surgery can be delayed.
-
-**Fitness advice:**
-
-> "Patient has anemia (Hb ___ g/dL), likely secondary to chronic blood loss. Anemia evaluation and optimization is advised. If surgery is clinically indicated due to ongoing bleeding, patient may proceed after discussion with surgical and anesthesia teams with appropriate perioperative blood management and blood availability."
-
----
-
-### Hb <8 g/dL
-
-**Assessment:**
-
-* Significant anemia.
-
-**Fitness advice:**
-
-> "Significant anemia (Hb ___ g/dL). Recommend correction and optimization of hemoglobin prior to elective major surgery unless urgent clinical indication exists."
-
----
-
-# 2. Thyroid Function (TSH)
-
-## TSH 5–10 mIU/L, FT4 normal
-
-(Subclinical hypothyroidism)
-
-**Fitness advice:**
-
-> "Subclinical hypothyroidism noted (TSH ___ mIU/L with normal FT4). No evidence of severe hypothyroidism. No medical contraindication to planned surgery from a thyroid perspective. Recommend initiation/adjustment of thyroid therapy and follow-up."
-
----
-
-## TSH >10 mIU/L, FT4 normal
-
-**Fitness advice:**
-
-> "Raised TSH (___ mIU/L) suggestive of subclinical hypothyroidism. Thyroid replacement therapy is advised. Since patient is clinically stable, no immediate perioperative contraindication identified. If surgery is required due to ongoing bleeding/clinical indication, may proceed after anesthetic and surgical team assessment."
-
----
-
-## Low FT4 / Overt hypothyroidism
-
-**Fitness advice:**
-
-> "Biochemical evidence of overt hypothyroidism. Recommend thyroid optimization prior to elective surgery. Defer surgery until clinically stabilized unless procedure is urgent."
-
----
-
-# 3. Serum Creatinine / Renal Function
-
-## Stable creatinine elevation (CKD)
-
-Example: Creatinine 1.5–2.5 mg/dL, stable, normal potassium
-
-**Fitness advice:**
-
-> "Known/stable renal dysfunction with creatinine ___ mg/dL. No evidence of acute kidney injury or electrolyte abnormality. Patient may proceed from physician perspective with renal precautions, avoidance of nephrotoxic agents, adequate hydration, and renal dose adjustment of medications."
-
----
-
-## Acute rise in creatinine / AKI
-
-**Fitness advice:**
-
-> "Acute worsening of renal function noted. Recommend evaluation and correction of underlying cause before elective surgery."
-
----
-
-## Severe renal dysfunction
-
-**Fitness advice:**
-
-> "Advanced renal impairment noted. Recommend nephrology evaluation and optimization prior to elective major surgery."
-
----
-
-# 4. SGPT / Liver Enzymes
-
-## Mild elevation (<2–3× ULN), normal bilirubin/INR
-
-**Fitness advice:**
-
-> "Mild transaminitis noted (SGPT ___). Liver synthetic function is preserved with normal bilirubin and coagulation profile. No medical contraindication to surgery from hepatic perspective. Recommend evaluation of cause and avoidance of hepatotoxic medications."
-
----
-
-## Marked elevation (>5× ULN) or acute hepatitis
-
-**Fitness advice:**
-
-> "Significant liver enzyme elevation suggestive of active hepatic injury. Recommend further evaluation and stabilization before elective surgery."
-
----
-
-## Liver failure features (raised INR, jaundice, ascites)
-
-**Fitness advice:**
-
-> "Evidence of impaired hepatic function. Elective surgery should be deferred pending optimization."
-
----
-
-# 5. WBC Count
-
-## Mild leukocytosis (11,000–15,000), clinically well
-
-**Fitness advice:**
-
-> "Mild leukocytosis noted. Patient is afebrile with no clinical evidence of active infection. No medical contraindication to surgery from physician perspective."
-
----
-
-## WBC >15,000 or suspected infection
-
-**Fitness advice:**
-
-> "Leukocytosis with possibility of active infection. Recommend evaluation and treatment prior to elective surgery."
-
----
-
-## Neutropenia
-
-ANC <1000/µL:
-
-**Fitness advice:**
-
-> "Significant neutropenia noted. Recommend evaluation and optimization before elective surgery due to increased infection risk."
-
----
-
-# 6. Platelet Count
-
-## Platelets ≥100,000/µL
-
-**Fitness advice:**
-
-> "Platelet count ___/µL. No significant thrombocytopenia. No medical contraindication from hematological perspective."
-
----
-
-## Platelets 75,000–100,000/µL
-
-**Fitness advice:**
-
-> "Mild thrombocytopenia noted. No history of abnormal bleeding and coagulation profile is acceptable. Surgery may proceed with perioperative bleeding risk awareness and anesthetic/surgical team planning."
-
----
-
-## Platelets 50,000–75,000/µL
-
-**Fitness advice:**
-
-> "Moderate thrombocytopenia noted. Recommend evaluation of cause and optimization before elective major surgery. Decision regarding proceeding should be individualized."
-
----
-
-## Platelets <50,000/µL
-
-**Fitness advice:**
-
-> "Significant thrombocytopenia with increased bleeding risk. Recommend correction and hematological optimization prior to elective major surgery."
-
----
-
-# Overall Final Fitness Line (when acceptable)
-
-> "Patient evaluated medically. No active medical contraindication identified for planned elective surgery. Existing abnormalities have been assessed and appropriate optimization advised. Final surgical fitness should be considered jointly with the operating surgeon and anesthesiologist after assessment of operative risk."
-
----
-
-# Overall "Do Not Clear / Defer" Situations
-
-* Active infection/sepsis
-* Acute kidney injury
-* Decompensated heart failure
-* Uncontrolled arrhythmia
-* Acute coronary syndrome
-* Severe hypothyroidism with symptoms/complications
-* Acute hepatitis or liver failure
-* Severe anemia requiring stabilization
-* Severe thrombocytopenia (<50,000/µL)
-
-</div>
-    
-<div id="ref-panel" style="display:none; background:#fff; border:1px solid #cbd5e1; border-radius:6px; padding:16px; font-size:0.82rem; line-height:1.7; max-height:400px; overflow-y:auto; margin-bottom:10px; white-space:pre-wrap; user-select:text;">
-
-  
-    <button class="btn-print" onclick="preparePrint()"> 🖨️ Print Certificate </button>
   </div>
 </div>
 
@@ -624,7 +377,7 @@ ANC <1000/µL:
     <p id="p-systemic"></p>
   </div>
 
-<div class="print-section" id="print-lab-section">
+  <div class="print-section" id="print-lab-section">
     <h4>Investigations</h4>
     <p id="p-labs" style="font-size: 0.80rem; line-height: 1.6; margin-top: 5px;"></p>
   </div>
@@ -641,62 +394,24 @@ ANC <1000/µL:
   </div>
 </div>
 
-<style>
-    /* This forcefully hides the bar when you click Print */
-    @media print {
-    #clinic-floating-footer { display: none !important; }
-    #statsMaintBtn { display: none !important; }
-    #lab-alert-banner { display: none !important; }
-    #ref-panel, #ref-panel + button { display: none !important; }
-
-}
-</style>
-<div id="clinic-floating-footer" style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: #37474F; color: #ECEFF1; font-size: 11px; padding: 6px 16px; z-index: 9999; display: flex; justify-content: center; align-items: center; gap: 12px; box-shadow: 0 -4px 10px rgba(0,0,0,0.15); font-family: sans-serif; letter-spacing: 0.5px; box-sizing: border-box;">
-    <span>&copy; Dr. Mit Panchani 2026-2027</span>
-    <span style="color: #90A4AE; font-size: 14px; line-height: 1;">•</span>
-    <span>Visitor Count - <span id="visitCount" style="font-weight: bold; color: #18FFFF; margin-left: 4px; letter-spacing: 1px;">...</span></span>
-    <span style="color: #90A4AE; font-size: 14px; line-height: 1;">•</span>
-    <span>Fitness Given - <span id="fitPrintedCount" style="font-weight: bold; color: #69F0AE; margin-left: 4px; letter-spacing: 1px;">...</span></span>
-</div>
-
-
-
 <script>
     
-    function clearInvestigationDefaults() {
-    // LIST OF IDS TO CLEAR FOR MINOR OT FITNESS
-    const fieldsToClear = [
-        'lab-urine', 
-        'lab-cxr', 
-        'lab-ecg', 
-        'lab-echo'
-    ];
-
+  function clearInvestigationDefaults() {
+    const fieldsToClear = ['lab-urine', 'lab-cxr', 'lab-ecg', 'lab-echo'];
     fieldsToClear.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.value = ""; // REMOVES THE "NOTED", "NORMAL", ETC.
-        }
+      const el = document.getElementById(id);
+      if (el) el.value = "";
     });
-
-    // TRIGGER AN AUTO-SAVE SO THE EMPTY STATE IS REMEMBERED
     saveFormState(); 
-}
+  }
 
-// ==========================================
   // VERTICAL ARROW KEY NAVIGATION
-  // ==========================================
   function enableVerticalArrowNav(className) {
     const inputs = Array.from(document.querySelectorAll('.' + className));
     inputs.forEach((input, index) => {
       input.addEventListener('keydown', function(e) {
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          if (index < inputs.length - 1) inputs[index + 1].focus();
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          if (index > 0) inputs[index - 1].focus();
-        }
+        if (e.key === 'ArrowDown') { e.preventDefault(); if (index < inputs.length - 1) inputs[index + 1].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); if (index > 0) inputs[index - 1].focus(); }
       });
     });
   }
@@ -704,7 +419,6 @@ ANC <1000/µL:
   enableVerticalArrowNav('arrow-nav-left');
   enableVerticalArrowNav('arrow-nav-right');
 
-  // 6-Column Grid Navigation for Labs (Up, Down, Left, Right)
   function enableGridArrowNav(className, columns) {
     const inputs = Array.from(document.querySelectorAll('.' + className));
     inputs.forEach((input, index) => {
@@ -719,149 +433,92 @@ ANC <1000/µL:
   
   enableGridArrowNav('arrow-nav-lab', 3);
 
-// ==========================================
   // BP SMART AUTO-FORMATTER
-  // ==========================================
   document.getElementById('v-bp').addEventListener('input', function (e) {
-    if (e.inputType === 'deleteContentBackward') {
-      generateAdvice(); // <--- Change this from generateNote()
-      return;
-    }
+    if (e.inputType === 'deleteContentBackward') { generateAdvice(); return; }
     let v = this.value;
-    // Auto add slash after exactly 3 digits
-    if (v.length === 3 && !v.includes('/')) {
-      this.value = v + '/';
-    }
-    generateAdvice(); // <--- Change this from generateNote()
+    if (v.length === 3 && !v.includes('/')) { this.value = v + '/'; }
+    generateAdvice();
   });
 
-  
-    // ==========================================
-  // INVISIBLE KEYSTROKE AUTHENTICATION LOGIC (MOBILE & DESKTOP SAFE)
-  // ==========================================
+  // AUTHENTICATION
   const CORRECT_PIN = "3342";
   const lockScreen = document.getElementById('auth-screen');
   const lockBox = document.getElementById('mac-lock-box');
   const mobilePinInput = document.getElementById('mobile-pin');
 
-  // Listen to the hidden input field instead of the whole document
   mobilePinInput.addEventListener('input', function(e) {
     let pinBuffer = this.value;
-    
-    // Auto-check on 4th digit
     if (pinBuffer.length >= 4) {
       if (pinBuffer === CORRECT_PIN) {
-        // Correct PIN: Scale up and fade out
         lockBox.classList.add('unlock-scale');
         lockScreen.classList.add('unlock-fade');
         setTimeout(() => {
           lockScreen.style.display = 'none';
-          document.body.style.overflow = 'auto'; // Restore scrolling
-          this.value = ""; // Reset security
+          document.body.style.overflow = 'auto';
+          this.value = "";
         }, 500);
       } else {
-        // Incorrect PIN: macOS Shake and reset
         lockBox.classList.remove('shake');
-        void lockBox.offsetWidth; // Force CSS reflow to restart animation
+        void lockBox.offsetWidth;
         lockBox.classList.add('shake');
-        this.value = ""; // Reset buffer instantly
+        this.value = "";
       }
     }
   });
 
-  // ==========================================
-// ROBUST AUTO-SAVE LOGIC (LOCALSTORAGE)
-// ==========================================
-
-function saveDraft() {
-  const formData = {};
-  
-  // 1. SAVE ALL STANDARD INPUTS, SELECTS, AND RADIOS
-  document.querySelectorAll('input, select, textarea').forEach(el => {
-    if (el.type === 'checkbox' || el.type === 'radio') {
-       // USE ID AS UNIQUE KEY FOR STATE
-       if (el.id) {
-         formData[el.id] = el.checked;
-       }
-    } else if (el.id) {
-       formData[el.id] = el.value;
-    }
-  });
-  
-  // 2. SAVE THE CONTENT-EDITABLE ADVICE BOX
-  formData['advice-box-html'] = document.getElementById('advice-box').innerHTML;
-  
-  localStorage.setItem('fitnessDraft_v2', JSON.stringify(formData));
-}
-
-function loadDraft() {
-  const saved = localStorage.getItem('fitnessDraft_v2');
-  
-  if (saved) {
-    const formData = JSON.parse(saved);
-    
-    // 1. RESTORE ALL INPUTS
+  // AUTO-SAVE (LOCALSTORAGE)
+  function saveDraft() {
+    const formData = {};
     document.querySelectorAll('input, select, textarea').forEach(el => {
-      if (el.id && formData[el.id] !== undefined) {
-        if (el.type === 'checkbox' || el.type === 'radio') {
-          el.checked = formData[el.id];
-          
-          // SPECIAL HANDLING: UPDATE VISUAL PILLS FOR KCO
-          if (el.classList.contains('kco-check')) {
-            if (el.checked) el.parentElement.classList.add('active');
-            else el.parentElement.classList.remove('active');
-          }
-        } else {
-          el.value = formData[el.id];
-        }
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.id) formData[el.id] = el.checked;
+      } else if (el.id) {
+        formData[el.id] = el.value;
       }
     });
-    
-    // 2. RESTORE RICH TEXT ADVICE
-    if (formData['advice-box-html']) {
-      document.getElementById('advice-box').innerHTML = formData['advice-box-html'];
-    }
-  } else {
-    // DEFAULT SETUP IF NO DATA EXISTS
-    document.getElementById('pt-date').valueAsDate = new Date();
-    generateAdvice();
+    formData['advice-box-html'] = document.getElementById('advice-box').innerHTML;
+    localStorage.setItem('fitnessDraft_v2', JSON.stringify(formData));
   }
-}
 
-// ==========================================
-// EVENT LISTENERS FOR PERSISTENCE
-// ==========================================
+  function loadDraft() {
+    const saved = localStorage.getItem('fitnessDraft_v2');
+    if (saved) {
+      const formData = JSON.parse(saved);
+      document.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.id && formData[el.id] !== undefined) {
+          if (el.type === 'checkbox' || el.type === 'radio') {
+            el.checked = formData[el.id];
+            if (el.classList.contains('kco-check')) {
+              if (el.checked) el.parentElement.classList.add('active');
+              else el.parentElement.classList.remove('active');
+            }
+          } else {
+            el.value = formData[el.id];
+          }
+        }
+      });
+      if (formData['advice-box-html']) {
+        document.getElementById('advice-box').innerHTML = formData['advice-box-html'];
+      }
+    } else {
+      document.getElementById('pt-date').valueAsDate = new Date();
+      generateAdvice();
+    }
+  }
 
-// TRIGGER SAVE ON ANY CHANGE
-document.addEventListener('input', (e) => {
-    saveDraft();
-});
+  document.addEventListener('input', () => saveDraft());
+  document.addEventListener('change', () => saveDraft());
+  window.addEventListener('load', loadDraft);
 
-document.addEventListener('change', (e) => {
-    saveDraft();
-});
-
-// LOAD DATA IMMEDIATELY ON PAGE LOAD
-window.addEventListener('load', loadDraft);
-
-  // ==========================================
-  // FORM LOGIC
-  // ==========================================
-  
-  // Auto-set today's date
   document.getElementById('pt-date').valueAsDate = new Date();
 
-  // Handle Pill selection and Auto-generation trigger
   function togglePill(el) {
-    if (el.checked) {
-      el.parentElement.classList.add('active');
-    } else {
-      el.parentElement.classList.remove('active');
-    }
+    if (el.checked) el.parentElement.classList.add('active');
+    else el.parentElement.classList.remove('active');
     generateAdvice();
   }
 
-  // Quick Exam Pills
   function appendExam(inputId, text) {
     let input = document.getElementById(inputId);
     if (["BSBE clear", "S1S2+, no murmur", "Soft and NT"].includes(input.value)) {
@@ -872,109 +529,90 @@ window.addEventListener('load', loadDraft);
     saveDraft();
   }
 
-// Smart Advice Generation (Merged Paragraphs & Lab Checks)
-function generateAdvice() {
-  let kco = Array.from(document.querySelectorAll('.kco-check:checked')).map(el => el.value);
-  
-  // --- NEW: AUTO LAB CHECKS ---
-  // Extract numbers using regex in case you type units (e.g., "9.5 g/dl")
-  let extractNum = (val) => { let m = val.match(/[\d.]+/); return m ? parseFloat(m[0]) : NaN; };
-  
-  let hb = extractNum(document.getElementById('lab-hb').value);
-  let rbs = extractNum(document.getElementById('lab-rbs').value);
-  let tsh = extractNum(document.getElementById('lab-tsh').value);
-
-  let unfitReasons = [];
-  if (!isNaN(hb) && hb < 10) unfitReasons.push(`Hb is ${hb} (<10)`);
-  if (!isNaN(rbs) && rbs > 200) unfitReasons.push(`RBS is ${rbs} (>200)`);
-  if (!isNaN(tsh) && tsh > 5) unfitReasons.push(`TSH is ${tsh} (>5)`);
-
-  let para1 = "";
-  if (unfitReasons.length > 0) {
-    para1 = `<span style="color: #ef4444;"><strong>FITNESS CANNOT BE GIVEN</strong> (Flagged: ${unfitReasons.join(", ")})</span>`;
-  } else {
-    // Paragraph 1: Fitness Status & Merged Goals
+  function generateAdvice() {
+    let kco = Array.from(document.querySelectorAll('.kco-check:checked')).map(el => el.value);
+    
     let fitConditions = [];
     if (kco.includes('HTN')) fitConditions.push("BP <= 140/90 mmHg");
     if (kco.includes('DM')) fitConditions.push("RBS <= 200 mg/dL");
     
-    para1 = "Patient is fit for surgery";
+    let para1 = "Patient is fit for surgery";
     if (fitConditions.length > 0) {
       para1 += ` with due risk, if ${fitConditions.join(" & ")} on day of OT.`;
     } else {
-      para1 += " with due risk."; // Fallback if neither DM nor HTN is checked
+      para1 += " with due risk.";
     }
-  }
 
-  // Paragraph 2: Medication Instructions (separated lines)
-  let medInstructions = [];
-  
-  if (kco.includes('DM')) {
-    medInstructions.push("Diabetes (OHAs): Omit morning dose of Oral Hypoglycemic Agents on the day of surgery. *Note for Major OT: Stop SGLT2 inhibitors (e.g., Dapagliflozin, Empagliflozin) 3 to 4 days prior to major surgery to avoid euglycemic DKA.*");
-    medInstructions.push("Diabetes (Insulin): Omit short-acting/prandial insulin on the morning of surgery. Administer 50-80% of usual long-acting/basal insulin dose. Bridge with short-acting insulin sliding scale to maintain perioperative target RBS of 140-180 mg/dL.");
-  }
-  
-  if (kco.includes('HTN')) {
-    medInstructions.push("Hypertension (Stop): Omit ACE Inhibitors / ARBs and Diuretics on the morning of surgery to prevent refractory perioperative hypotension and volume depletion.");
-    medInstructions.push("Hypertension (Continue): Strict continuation of Beta-blockers, Calcium Channel Blockers, or other anti-hypertensives on the morning of surgery with a sip of water.");
-  }
-  
-  if (kco.includes('IHD') || kco.includes('S/P CABG') || kco.includes('S/P PTCA')) {
+    let medInstructions = [];
+    
+    if (kco.includes('DM')) {
+      medInstructions.push("Diabetes (OHAs): Omit morning dose of Oral Hypoglycemic Agents on the day of surgery. *Note for Major OT: Stop SGLT2 inhibitors (e.g., Dapagliflozin, Empagliflozin) 3 to 4 days prior to major surgery to avoid euglycemic DKA.*");
+      medInstructions.push("Diabetes (Insulin): Omit short-acting/prandial insulin on the morning of surgery. Administer 50-80% of usual long-acting/basal insulin dose. Bridge with short-acting insulin sliding scale to maintain perioperative target RBS of 140-180 mg/dL.");
+    }
+    
+    if (kco.includes('HTN')) {
+      medInstructions.push("Hypertension (Stop): Omit ACE Inhibitors / ARBs and Diuretics on the morning of surgery to prevent refractory perioperative hypotension and volume depletion.");
+      medInstructions.push("Hypertension (Continue): Strict continuation of Beta-blockers, Calcium Channel Blockers, or other anti-hypertensives on the morning of surgery with a sip of water.");
+    }
+    
+    if (kco.includes('IHD') || kco.includes('S/P CABG') || kco.includes('S/P PTCA')) {
       medInstructions.push("Antiplatelets: Stop Clopidogrel/Ticagrelor 5 days (Prasugrel 7 days) before surgery. Resume 24 hours post-op once hemostasis is achieved.");
       medInstructions.push("Aspirin: Continue perioperatively (except in strict neuro, uro, or ophthalmic surgeries).");
       medInstructions.push("Warfarin (Cataract/Minor): Continue therapy. Check INR 24-72 hours prior (target 2-3). Stop if INR > 3. No LMWH bridging required.");
       medInstructions.push("DOACs (Cataract/Minor): Continue therapy. No bridging or blood IVx required.");
       medInstructions.push("Warfarin (Major OT): Stop 5 days prior. Bridge with LMWH (1mg/kg BID) ONLY for high thrombotic risk. Stop LMWH 24h before surgery. Resume Warfarin 12-24 hours post-op. Restart LMWH 48-72 hours post-op until INR ≥ 2.0.");
       medInstructions.push("DOACs (Major OT): Strictly avoid LMWH bridging. Standard renal function: stop 24h prior (low bleeding risk sx) or 48h prior (high bleeding risk sx). Impaired renal function (CrCl 15-50): stop 48h prior (low risk) or 72-96h prior (high risk). Resume 24h post op (Low bleeding risk sx); 48-72h (high bleeding risk sx)");
-  } 
-  
-  if (kco.includes('Asthma') || kco.includes('COPD')) medInstructions.push("Asthma/COPD: Continue all inhalers morning of surgery; consider pre-op nebulization and avoid elective OT if active wheeze or acute exacerbation is present.");
-  if (kco.includes('Thyroid Disorder') || kco.includes('Hyperthyroid') || kco.includes('Hypothyroid')) medInstructions.push("Thyroid: Continue thyroid medications morning of surgery; ensure euthyroid state (normal TSH/T3/T4) prior to elective OT to prevent thyroid storm or myxedema coma.");
-  if (kco.includes('Epilepsy')) medInstructions.push("Seizures: Strictly continue all anti-epileptic drugs on the morning of surgery with a sip of water to prevent breakthrough perioperative seizures.");
-  if (kco.includes('CKD')) medInstructions.push("CKD/Dialysis: Schedule hemodialysis the day before elective surgery (never on the day of), and strictly avoid NSAIDs for post-op analgesia.");
-  if (kco.includes('Chronic Steroids')) medInstructions.push("Chronic Steroids: Continue morning oral steroid dose and administer intra-operative IV stress-dose hydrocortisone to prevent acute adrenal crisis.");
-  if (kco.includes('OSA')) medInstructions.push("OSA: Instruct patient to bring their personal CPAP/BiPAP machine to the hospital for immediate post-op use in the recovery room; use opioids with extreme caution.");
-  if (kco.includes('Psychiatry')) medInstructions.push("Psychiatry: Stop Lithium 24-48 hours prior to major surgery to avoid toxicity; continue SSRIs/SNRIs on the morning of surgery.");
+    } 
+    
+    if (kco.includes('Asthma') || kco.includes('COPD')) {
+      medInstructions.push("Asthma/COPD: Continue all inhalers morning of surgery; consider pre-op nebulization and avoid elective OT if active wheeze or acute exacerbation is present.");
+    }
 
-   let adviceHTML = `<span style="font-weight: bold; font-size: 1rem;">${para1}</span>`;
+    if (kco.includes('Thyroid Disorder') || kco.includes('Hyperthyroid') || kco.includes('Hypothyroid')) {
+      medInstructions.push("Thyroid: Continue thyroid medications morning of surgery; ensure euthyroid state (normal TSH/T3/T4) prior to elective OT to prevent thyroid storm or myxedema coma.");
+    }
 
-  const contMeds = document.getElementById('chk-cont-meds') && document.getElementById('chk-cont-meds').checked;
+    if (kco.includes('Epilepsy')) {
+      medInstructions.push("Seizures: Strictly continue all anti-epileptic drugs on the morning of surgery with a sip of water to prevent breakthrough perioperative seizures.");
+    }
 
-  if (!contMeds && medInstructions.length > 0) {
-    adviceHTML += `<br><br><span style="font-weight: normal; font-size: 0.85rem;"><strong>Medication Instructions:</strong><br>• ` + medInstructions.join("<br>• ") + `</span>`;
+    if (kco.includes('CKD')) {
+      medInstructions.push("CKD/Dialysis: Schedule hemodialysis the day before elective surgery (never on the day of), and strictly avoid NSAIDs for post-op analgesia.");
+    }
+
+    if (kco.includes('Chronic Steroids')) {
+      medInstructions.push("Chronic Steroids: Continue morning oral steroid dose and administer intra-operative IV stress-dose hydrocortisone to prevent acute adrenal crisis.");
+    }
+
+    if (kco.includes('OSA')) {
+      medInstructions.push("OSA: Instruct patient to bring their personal CPAP/BiPAP machine to the hospital for immediate post-op use in the recovery room; use opioids with extreme caution.");
+    }
+
+    if (kco.includes('Psychiatry')) {
+      medInstructions.push("Psychiatry: Stop Lithium 24-48 hours prior to major surgery to avoid toxicity; continue SSRIs/SNRIs on the morning of surgery.");
+    }
+
+    let adviceHTML = `<span style="font-weight: bold; font-size: 1rem;">${para1}</span>`;
+    if (medInstructions.length > 0) {
+      adviceHTML += `<br><br><span style="font-weight: normal; font-size: 0.85rem;"><strong>Medication Instructions:</strong><br>• ` + medInstructions.join("<br>• ") + `</span>`;
+    }
+
+    document.getElementById('advice-box').innerHTML = adviceHTML;
+    saveDraft();
   }
 
-  let appends = [];
-  if (document.getElementById('chk-anesthetist') && document.getElementById('chk-anesthetist').checked) {
-      appends.push("<strong>Final fitness will be given by anesthetist.</strong>");
-  }
-  if (contMeds) {
-      appends.push("<strong>Continue all ongoing medications as prescribed.</strong>");
-  }
-
-  if (appends.length > 0) {
-      adviceHTML += `<br><br><span style="font-weight: normal; font-size: 0.85rem; color: #0284c7;">` + appends.join("<br>") + `</span>`;
-  }
-
-  document.getElementById('advice-box').innerHTML = adviceHTML;
-  saveDraft();
-}
-  // Dynamic Print Preparation
   function preparePrint() {
-    // 1. Demographics
     document.getElementById('p-name').innerText = document.getElementById('pt-name').value || "---------";
     document.getElementById('p-age-sex').innerText = `${document.getElementById('pt-age').value || "--"} Yrs / ${document.getElementById('pt-gender').value}`;
     
     let d = document.getElementById('pt-date').value;
     if(d) {
-       let dateObj = new Date(d);
-       document.getElementById('p-date').innerText = dateObj.toLocaleDateString('en-GB'); 
+      let dateObj = new Date(d);
+      document.getElementById('p-date').innerText = dateObj.toLocaleDateString('en-GB'); 
     }
     document.getElementById('p-ot').innerText = document.getElementById('pt-ot').value || "---------";
     
-// 2. KCO, T/T & Medicines Not Brought
     let kcoChecked = Array.from(document.querySelectorAll('.kco-check:checked')).map(el => el.value);
-    
     let kcoString = kcoChecked.length > 0 ? "KCO " + kcoChecked.join(", ") : "No significant past medical history";
     
     if (kcoChecked.length > 0) {
@@ -986,21 +624,15 @@ function generateAdvice() {
       kcoString += " Medicines not brought.";
     }
 
-   // Add Other History
     let otherKco = document.getElementById('kco-other') ? document.getElementById('kco-other').value.trim() : "";
-    if (otherKco) {
-      kcoString += `<br><br><b>Other Medical/Surgical History:</b> ${otherKco}`;
-    }
+    if (otherKco) kcoString += `<br><br><b>Other Medical/Surgical History:</b> ${otherKco}`;
 
-    // Add Docs Not Available Check
     if (document.getElementById('docs-not-avail') && document.getElementById('docs-not-avail').checked) {
       kcoString += "<br><br><b>Note:</b> Old medical documents/records are not available.";
     }
 
- 
     document.getElementById('p-kco').innerHTML = kcoString;
     
-    // 3. Dynamic Vitals
     let vitals = [];
     let getV = (id, label, unit) => { let v = document.getElementById(id).value.trim(); if(v) vitals.push(`<b>${label}:</b> ${v} ${unit}`); };
     getV('v-temp', 'Temp', '');
@@ -1008,20 +640,16 @@ function generateAdvice() {
     getV('v-rr', 'RR', '/min');
     getV('v-bp', 'BP', 'mmHg');
     getV('v-spo2', 'SpO2', '');
-    
     document.getElementById('p-vitals').innerHTML = vitals.length > 0 ? vitals.join(' &nbsp;|&nbsp; ') : "No vitals recorded.";
 
-    // 4. Dynamic Systemic Exam
     let sys = [];
     let getSys = (id, label) => { let v = document.getElementById(id).value.trim(); if(v) sys.push(`<b>${label}:</b> ${v}`); };
     getSys('exam-rs', 'RS');
     getSys('exam-cvs', 'CVS');
     getSys('exam-cns', 'CNS');
     getSys('exam-pa', 'P/A');
-    
     document.getElementById('p-systemic').innerHTML = sys.join(' &nbsp;|&nbsp; ');
 
-   // 5. Ultra-Compact Dynamic Labs
     const allLabs = [
       { id: 'lab-hb', label: 'Hb' }, { id: 'lab-tc', label: 'TC' }, { id: 'lab-plt', label: 'Plt' },
       { id: 'lab-rbs', label: 'RBS' }, { id: 'lab-hba1c', label: 'HbA1c' }, { id: 'lab-creat', label: 'Cr' },
@@ -1036,580 +664,33 @@ function generateAdvice() {
     }).filter(val => val !== null);
 
     document.getElementById('p-labs').innerHTML = activeLabs.length > 0 ? activeLabs.join(' &nbsp;|&nbsp; ') : "No investigations recorded.";
-
-    // 6. Advice
     document.getElementById('p-advice').innerHTML = document.getElementById('advice-box').innerHTML;
-
-    // --- NEW: Trigger the Fitness Counter Increment Before Printing ---
-    fetch("https://visits.drmjp93.workers.dev/?tool=fit_printed")
-        .then(r => r.json())
-        .then(data => {
-            if (data && data.count !== undefined) {
-                const fitEl = document.getElementById("fitPrintedCount");
-                if (fitEl) fitEl.textContent = data.count;
-            }
-        }).catch(e => console.error("Fitness Counter error:", e));
-    // -------------------------------------------------------------
-
-
-    // --- Log to Stats only if pill is checked ---
-    const logPill = document.getElementById('fitnessLogPill');
-    if (logPill && logPill.checked) {
-        const MAINT_KEY = 'statsMaintenanceMode_fitness';
-        if (localStorage.getItem(MAINT_KEY) !== 'true') {
-            fetch('https://opd-api.drmjp93.workers.dev/ping', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-Secret-Key': 'DrMJP_Secure_2026'
-                },
-                body: JSON.stringify({ 
-                    date: new Date().toLocaleDateString('en-CA'), 
-                    source: 'fitness' 
-                })
-            }).catch(() => {});
-        }
-        // Auto-uncheck after print so next patient starts fresh
-        logPill.checked = false;
-    }
-    
     window.print();
   }
 
   function clearForm() {
-  // 1. Wipe out the CORRECT storage key
-  localStorage.removeItem('fitnessDraft_v2');
-
-  // 2. Clear all text and number inputs
-  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(el => el.value = "");
-
-  // 3. Reset date and gender
-  document.getElementById('pt-date').valueAsDate = new Date();
-  document.getElementById('pt-gender').selectedIndex = 0;
-
-  // 4. Reset ALL status checkboxes (Added docs-not-avail here)
-  document.getElementById('docs-not-avail').checked = false;
-  document.getElementById('meds-not-brought').checked = false;
-
-  // 5. Reset KCO pills and visual styling
-  document.querySelectorAll('.kco-check').forEach(el => {
-    el.checked = false;
-    if (el.parentElement.classList.contains('kco-pill')) {
-      el.parentElement.classList.remove('active');
-    }
-  });
-
-  // Reset lab alert banner
-  for (const key in activeLabAlerts) delete activeLabAlerts[key];
-  document.getElementById('lab-alert-banner').style.display = 'none';
-
-
-
-  // 6. Reset radio buttons
-  document.getElementById('on-tt').checked = true;
-
-  // 7. Reset clinical defaults (Matching your exact strings)
-  document.getElementById('kco-other').value = "No PHO Surgery";
-  document.getElementById('v-temp').value = "Afebrile";
-  document.getElementById('v-spo2').value = "98% with RA";
-  document.getElementById('exam-rs').value = "BSBE clear";
-  document.getElementById('exam-cvs').value = "S1S2+, no murmur";
-  document.getElementById('exam-cns').value = "Conscious, orientated";
-  document.getElementById('exam-pa').value = "Soft and NT";
-  document.getElementById('lab-urine').value = "Noted";
-  document.getElementById('lab-ecg').value = "WNL";
-  document.getElementById('lab-echo').value = "Noted";
-  document.getElementById('lab-cxr').value = "Noted";
-
-  document.getElementById('chk-anesthetist').checked = false;
-  document.getElementById('chk-cont-meds').checked = false;
-
-  // 8. Regenerate advice and SAVE the empty state to localStorage
-  generateAdvice();
-  saveDraft(); 
-}
-
-// ==========================================
-  // AUTO-EXPANDING TEXTAREAS FOR LONG LABS
-  // ==========================================
-  document.querySelectorAll('.auto-wrap').forEach(el => {
-    // Function to adjust height dynamically
-    const resize = () => {
-      el.style.height = 'auto';
-      el.style.height = (el.scrollHeight) + 'px';
-    };
-    
-    // Resize on input
-    el.addEventListener('input', resize);
-    
-    // Delay initial resize slightly to ensure CSS has loaded
-    setTimeout(resize, 100); 
-  });
-
-  
-// ========================================================
-// PAGE LOAD COUNTERS (Visitors & Read-Only Fitness Given)
-// ========================================================
-(async function () {
-  // 1. Visitor Counter (Increments on load)
-  const visitEl = document.getElementById("visitCount");
-  if (visitEl) {
-    try {
-      const resp = await fetch("https://visits.drmjp93.workers.dev/?tool=fit");
-      const j = await resp.json();
-      visitEl.textContent = (j && j.count !== undefined) ? j.count : "0";
-    } catch (e) {
-      visitEl.textContent = "—";
-    }
-  }
-
-  // 2. Fitness Given Counter (Read-only on load)
-  const fitEl = document.getElementById("fitPrintedCount");
-  if (fitEl) {
-    try {
-      // Notice the action=read parameter here!
-      const resp = await fetch("https://visits.drmjp93.workers.dev/?tool=fit_printed&action=read");
-      const j = await resp.json();
-      fitEl.textContent = (j && j.count !== undefined) ? j.count : "0";
-    } catch (e) {
-      fitEl.textContent = "—";
-    }
-  }
-})();
-
-  // ══════════════════════════════════════════
-// CLOUD CLIPBOARD ENGINE: FITNESS PAGE
-// ══════════════════════════════════════════
-const CLOUD_API_URL = "https://clipboard.drmjp93.workers.dev"; // <-- Make sure this matches your worker!
-
-async function saveToCloudClipboard() {
-    const btn = event.target;
-    btn.innerText = "Saving...";
-
-    // Grab exactly from Fitness IDs
-    const patientData = {
-        date: document.getElementById('pt-date') ? document.getElementById('pt-date').value : '',
-        sex: document.getElementById('pt-gender') ? document.getElementById('pt-gender').value : '',
-        name: document.getElementById('pt-name') ? document.getElementById('pt-name').value : '',
-        age: document.getElementById('pt-age') ? document.getElementById('pt-age').value : '',
-        bp: document.getElementById('v-bp') ? document.getElementById('v-bp').value : '',
-        pulse: document.getElementById('v-pr') ? document.getElementById('v-pr').value : '',
-        temp: document.getElementById('v-temp') ? document.getElementById('v-temp').value : '',
-        spo2: document.getElementById('v-spo2') ? document.getElementById('v-spo2').value : '',
-        rs: document.getElementById('exam-rs') ? document.getElementById('exam-rs').value : '',
-        cvs: document.getElementById('exam-cvs') ? document.getElementById('exam-cvs').value : '',
-        pa: document.getElementById('exam-pa') ? document.getElementById('exam-pa').value : '',
-        cns: document.getElementById('exam-cns') ? document.getElementById('exam-cns').value : ''
-    };
-
-    try {
-        await fetch(`${CLOUD_API_URL}/?action=save`, {
-            method: "POST",
-            body: JSON.stringify(patientData)
-        });
-        btn.innerText = "✓ Saved!";
-        setTimeout(() => btn.innerText = "↑ Send to Cloud", 2000);
-    } catch (e) {
-        alert("Failed to save to cloud");
-        btn.innerText = "↑ Send to Cloud";
-    }
-}
-
-async function loadFromCloudClipboard() {
-    const btn = event.target;
-    btn.innerText = "Fetching...";
-
-    try {
-        const res = await fetch(`${CLOUD_API_URL}/?action=load`);
-        const data = await res.json();
-
-        if (!data.name && !data.age) {
-            alert("Cloud clipboard is empty!");
-            btn.innerText = "↓ Fetch from Cloud";
-            return;
-        }
-
-        // Paste exactly into Fitness IDs
-        if (data.date && document.getElementById('pt-date')) document.getElementById('pt-date').value = data.date;
-        if (data.name && document.getElementById('pt-name')) document.getElementById('pt-name').value = data.name;
-        if (data.age && document.getElementById('pt-age')) document.getElementById('pt-age').value = data.age;
-        if (data.bp && document.getElementById('v-bp')) document.getElementById('v-bp').value = data.bp;
-        if (data.pulse && document.getElementById('v-pr')) document.getElementById('v-pr').value = data.pulse;
-        if (data.temp && document.getElementById('v-temp')) document.getElementById('v-temp').value = data.temp;
-        if (data.spo2 && document.getElementById('v-spo2')) document.getElementById('v-spo2').value = data.spo2;
-        if (data.rs && document.getElementById('exam-rs')) document.getElementById('exam-rs').value = data.rs;
-        if (data.cvs && document.getElementById('exam-cvs')) document.getElementById('exam-cvs').value = data.cvs;
-        if (data.pa && document.getElementById('exam-pa')) document.getElementById('exam-pa').value = data.pa;
-        if (data.cns && document.getElementById('exam-cns')) document.getElementById('exam-cns').value = data.cns;
-
-        // Smart translator for Gender (OPD sends 'M', Fitness needs 'MALE')
-        if (data.sex && document.getElementById('pt-gender')) {
-            const s = data.sex.toUpperCase();
-            if (s === 'M') document.getElementById('pt-gender').value = 'MALE';
-            else if (s === 'F') document.getElementById('pt-gender').value = 'FEMALE';
-            else document.getElementById('pt-gender').value = s;
-        }
-
-        btn.innerText = "✓ Fetched!";
-        setTimeout(() => btn.innerText = "↓ Fetch from Cloud", 2000);
-    } catch (e) {
-        alert("Failed to load from cloud");
-        btn.innerText = "↓ Fetch from Cloud";
-    }
-}
-
-  // ══════════════════════════════════════════
-// CLOUD DRAFTS BANK (UP TO 15 PATIENTS, SYNCED ACROSS PCs)
-// ══════════════════════════════════════════
-
-let cloudDraftsCache = []; // last fetched list, used by loadFitnessDraft()
-
-// 1. This runs as soon as the page opens to load the saved list from the cloud
-document.addEventListener("DOMContentLoaded", updateDraftDropdown);
-
-async function fetchCloudDrafts() {
-    try {
-        const res = await fetch(`${CLOUD_API_URL}/?action=load_drafts`);
-        const data = await res.json();
-        return Array.isArray(data) ? data : [];
-    } catch (e) {
-        return cloudDraftsCache || [];
-    }
-}
-
-async function postCloudDrafts(drafts) {
-    await fetch(`${CLOUD_API_URL}/?action=save_drafts`, {
-        method: "POST",
-        body: JSON.stringify(drafts)
+    localStorage.removeItem('fitnessDraft');
+    document.querySelectorAll('input[type="text"], input[type="number"]').forEach(el => el.value = "");
+    document.getElementById('pt-date').valueAsDate = new Date();
+    document.getElementById('pt-gender').selectedIndex = 0;
+    document.querySelectorAll('.kco-check, #meds-not-brought').forEach(el => {
+      el.checked = false;
+      if (el.parentElement.classList.contains('kco-pill')) el.parentElement.classList.remove('active');
     });
-}
-
-async function updateDraftDropdown() {
-    const select = document.getElementById('draft-selector');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">-- Loading from cloud... --</option>';
-
-    cloudDraftsCache = await fetchCloudDrafts();
-
-    select.innerHTML = '<option value="">-- Select a recent patient --</option>';
-    cloudDraftsCache.forEach((d, index) => {
-        let opt = document.createElement('option');
-        opt.value = index;
-        opt.innerText = d.label;
-        select.appendChild(opt);
-    });
-}
-
-async function saveFitnessDraft() {
-    const nameBox = document.getElementById('pt-name');
-    const ptName = nameBox && nameBox.value ? nameBox.value : 'Unknown Patient';
-    const today = new Date().toLocaleDateString('en-GB');
-    const draftLabel = `${ptName} (${today})`;
-
-    const dataToSave = {
-        date:    document.getElementById('pt-date')?.value || '',
-        sex:     document.getElementById('pt-gender')?.value || '',
-        name:    ptName,
-        age:     document.getElementById('pt-age')?.value || '',
-        ot:      document.getElementById('pt-ot')?.value || '',        // ✅ PROCEDURE
-        bp:      document.getElementById('v-bp')?.value || '',
-        pulse:   document.getElementById('v-pr')?.value || '',
-        temp:    document.getElementById('v-temp')?.value || '',
-        spo2:    document.getElementById('v-spo2')?.value || '',
-        rr:      document.getElementById('v-rr')?.value || '',
-        rs:      document.getElementById('exam-rs')?.value || '',
-        cvs:     document.getElementById('exam-cvs')?.value || '',
-        pa:      document.getElementById('exam-pa')?.value || '',
-        cns:     document.getElementById('exam-cns')?.value || '',
-        // ✅ ALL LABS
-        hb:      document.getElementById('lab-hb')?.value || '',
-        tc:      document.getElementById('lab-tc')?.value || '',
-        plt:     document.getElementById('lab-plt')?.value || '',
-        inr:     document.getElementById('lab-inr')?.value || '',
-        rbs:     document.getElementById('lab-rbs')?.value || '',
-        tsh:     document.getElementById('lab-tsh')?.value || '',
-        creat:   document.getElementById('lab-creat')?.value || '',
-        sgpt:    document.getElementById('lab-sgpt')?.value || '',
-        hba1c:   document.getElementById('lab-hba1c')?.value || '',
-        aptt:    document.getElementById('lab-aptt')?.value || '',
-        pt:      document.getElementById('lab-pt')?.value || '',
-        urine:   document.getElementById('lab-urine')?.value || '',
-        // ✅ REPORTS (textareas)
-        ecg:     document.getElementById('lab-ecg')?.value || '',
-        echo:    document.getElementById('lab-echo')?.value || '',
-        cxr:     document.getElementById('lab-cxr')?.value || '',
-        // ✅ KCO CHECKBOXES
-        kco:     Array.from(document.querySelectorAll('.kco-check'))
-                      .filter(cb => cb.checked).map(cb => cb.value),
-        kcoOther: document.getElementById('kco-other')?.value || '',
-        // ✅ STATUS PILLS
-        docsNotAvail:  document.getElementById('docs-not-avail')?.checked || false,
-        medsNotBrought: document.getElementById('meds-not-brought')?.checked || false,
-        onTT:          document.getElementById('on-tt')?.checked ?? true,
-        // ✅ ADVICE BOX
-        adviceHtml: document.getElementById('advice-box')?.innerHTML || ''
-    };
-
-    let drafts = await fetchCloudDrafts();
-    drafts = drafts.filter(d => d.name !== ptName);
-    drafts.unshift({ label: draftLabel, name: ptName, data: dataToSave });
-    if (drafts.length > 15) drafts = drafts.slice(0, 15);
-    await postCloudDrafts(drafts);
-    cloudDraftsCache = drafts;
-    await updateDraftDropdown();
-    alert("✓ Draft saved to the cloud — fetchable from any PC!");
-}
-
-async function loadFitnessDraft() {
-    const select = document.getElementById('draft-selector');
-    const selectedIndex = select.value;
-    if (selectedIndex === "") { return; }
-
-    const drafts = await fetchCloudDrafts(); // always pull fresh, in case another PC saved since page load
-    const patient = drafts[selectedIndex];
-    if (!patient) return;
-    const d = patient.data;
-
-    // Basic info
-    if (d.date)  document.getElementById('pt-date').value  = d.date;
-    if (d.sex)   document.getElementById('pt-gender').value = d.sex;
-    if (d.name)  document.getElementById('pt-name').value  = d.name;
-    if (d.age)   document.getElementById('pt-age').value   = d.age;
-    if (d.ot)    document.getElementById('pt-ot').value    = d.ot;    // ✅ PROCEDURE
-
-    // Vitals
-    if (d.bp)    document.getElementById('v-bp').value    = d.bp;
-    if (d.pulse) document.getElementById('v-pr').value    = d.pulse;
-    if (d.temp)  document.getElementById('v-temp').value  = d.temp;
-    if (d.spo2)  document.getElementById('v-spo2').value  = d.spo2;
-    if (d.rr)    document.getElementById('v-rr').value    = d.rr;
-
-    // Exam
-    if (d.rs)    document.getElementById('exam-rs').value  = d.rs;
-    if (d.cvs)   document.getElementById('exam-cvs').value = d.cvs;
-    if (d.pa)    document.getElementById('exam-pa').value  = d.pa;
-    if (d.cns)   document.getElementById('exam-cns').value = d.cns;
-
-    // Labs ✅
-    if (d.hb)    document.getElementById('lab-hb').value    = d.hb;
-    if (d.tc)    document.getElementById('lab-tc').value    = d.tc;
-    if (d.plt)   document.getElementById('lab-plt').value   = d.plt;
-    if (d.inr)   document.getElementById('lab-inr').value   = d.inr;
-    if (d.rbs)   document.getElementById('lab-rbs').value   = d.rbs;
-    if (d.tsh)   document.getElementById('lab-tsh').value   = d.tsh;
-    if (d.creat) document.getElementById('lab-creat').value = d.creat;
-    if (d.sgpt)  document.getElementById('lab-sgpt').value  = d.sgpt;
-    if (d.hba1c) document.getElementById('lab-hba1c').value = d.hba1c;
-    if (d.aptt)  document.getElementById('lab-aptt').value  = d.aptt;
-    if (d.pt)    document.getElementById('lab-pt').value    = d.pt;
-    if (d.urine) document.getElementById('lab-urine').value = d.urine;
-
-    // Reports (textareas) ✅
-    if (d.ecg)  document.getElementById('lab-ecg').value  = d.ecg;
-    if (d.echo) document.getElementById('lab-echo').value = d.echo;
-    if (d.cxr)  document.getElementById('lab-cxr').value  = d.cxr;
-
-    // KCO pills ✅
-    if (d.kco) {
-        document.querySelectorAll('.kco-check').forEach(cb => {
-            cb.checked = d.kco.includes(cb.value);
-            if (cb.checked) cb.parentElement.classList.add('active');
-            else cb.parentElement.classList.remove('active');
-        });
-    }
-    if (d.kcoOther !== undefined) document.getElementById('kco-other').value = d.kcoOther;
-
-    // Status pills ✅
-    if (d.docsNotAvail !== undefined)   document.getElementById('docs-not-avail').checked  = d.docsNotAvail;
-    if (d.medsNotBrought !== undefined) document.getElementById('meds-not-brought').checked = d.medsNotBrought;
-    document.getElementById('on-tt').checked  = d.onTT !== false;
-    document.getElementById('off-tt').checked = d.onTT === false;
-
-    // Advice box ✅
-    if (d.adviceHtml) document.getElementById('advice-box').innerHTML = d.adviceHtml;
-}
-
-// LAB RANGE ALERT BANNER
-const LAB_RANGES = {
-  'lab-hb':    { low: 10,  high: 16,   name: 'Hb',    unit: 'g/dL' },
-  'lab-tc':    { low: 4000, high: 11000, name: 'TC',   unit: '/mm³' },
-  'lab-plt':   { low: 150000, high: 450000, name: 'Platelet', unit: '/mm³' },
-  'lab-inr':   { low: 0.8, high: 1.3,  name: 'INR',   unit: '' },
-  'lab-rbs':   { low: 70,  high: 140,  name: 'RBS',   unit: 'mg/dL' },
-  'lab-tsh':   { low: 0.4, high: 5.0,  name: 'TSH',   unit: 'µIU/mL' },
-  'lab-creat': { low: 0.6, high: 1.4,  name: 'S.Creat', unit: 'mg/dL' },
-  'lab-sgpt':  { low: 7,   high: 56,   name: 'SGPT',  unit: 'U/L' },
-  'lab-hba1c': { low: 4,   high: 5.6,  name: 'HBa1c', unit: '%' },
-  'lab-aptt':  { low: 25,  high: 35,   name: 'APTT',  unit: 'sec' },
-  'lab-pt':    { low: 11,  high: 13.5, name: 'PT',    unit: 'sec' }
-};
-
-Object.keys(LAB_RANGES).forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('input', () => checkLabAlert(el, id));
-  } else {
-    console.warn('Lab alert: element not found ->', id);
+    document.getElementById('on-tt').checked = true;
+    document.getElementById('kco-other').value = "No PHO Surgery";
+    document.getElementById('v-temp').value = "Afebrile";
+    document.getElementById('v-spo2').value = "98% with RA";
+    document.getElementById('exam-rs').value = "BSBE clear";
+    document.getElementById('exam-cvs').value = "S1S2+, no murmur";
+    document.getElementById('exam-cns').value = "Conscious, orientated";
+    document.getElementById('exam-pa').value = "Soft and NT";
+    document.getElementById('lab-urine').value = "Noted";
+    document.getElementById('lab-ecg').value = "WNL";
+    document.getElementById('lab-echo').value = "Noted";
+    document.getElementById('lab-cxr').value = "Noted";
+    generateAdvice();
   }
-});
-
-
-const activeLabAlerts = {};
-
-function checkLabAlert(inputEl, rangeKey) {
-  const banner = document.getElementById('lab-alert-banner');
-  const range = LAB_RANGES[rangeKey];
-  const raw = inputEl.value.replace(/,/g, '');
-  const val = parseFloat(raw);
-
-  if (!range || isNaN(val)) {
-    delete activeLabAlerts[rangeKey];
-  } else if (val < range.low) {
-    activeLabAlerts[rangeKey] = `⚠ LOW ${range.name}: ${inputEl.value} ${range.unit} (Normal: ${range.low}-${range.high})`;
-  } else if (val > range.high) {
-    activeLabAlerts[rangeKey] = `⚠ HIGH ${range.name}: ${inputEl.value} ${range.unit} (Normal: ${range.low}-${range.high})`;
-  } else {
-    delete activeLabAlerts[rangeKey];
-  }
-
-  const messages = Object.values(activeLabAlerts);
-  if (messages.length) {
-    banner.style.background = '#dc2626';
-    banner.innerHTML = messages.join(' &nbsp;|&nbsp; ');
-    banner.style.display = 'block';
-  } else {
-    banner.style.display = 'none';
-  }
-}
-// ==========================================
-  // PLATELET SMART AUTO-FORMATTER & VISUAL FEEDBACK
-  // ==========================================
-  document.getElementById('lab-plt').addEventListener('input', function (e) {
-    let raw = this.value.replace(/,/g, '');
-    let numValue = parseInt(raw, 10);
-    let labelEl = this.previousElementSibling; // Grabs the grey <label> box
-
-    // Set up label for stacked text
-    labelEl.style.flexDirection = 'column';
-    labelEl.style.lineHeight = '1';
-    labelEl.style.padding = '4px 2px';
-
-    if (/^\d+$/.test(raw)) {
-      // 1. Auto-format with commas (Indian System)
-      this.value = Number(raw).toLocaleString('en-IN');
-
-      // 2. Visual Text Feedback inside the Label
-      if (numValue >= 100000) {
-        // Calculates Lakhs (e.g., 150000 -> 1.5)
-        let lakhs = parseFloat((numValue / 100000).toFixed(2));
-        labelEl.innerHTML = `Plt<br><span style="font-size:0.65rem; color:#15803d; font-weight:900; margin-top:3px;">${lakhs} L</span>`;
-        
-        this.style.color = ''; // Keep input standard color
-        this.style.fontWeight = 'bold';
-      } else {
-        // Calculates Thousands (e.g., 50000 -> 50)
-        let k = parseFloat((numValue / 1000).toFixed(1));
-        labelEl.innerHTML = `Plt<br><span style="font-size:0.65rem; color:#dc2626; font-weight:900; margin-top:3px;">${k} K</span>`;
-        
-        this.style.color = '#dc2626'; // Alert! Make input text Red
-        this.style.fontWeight = 'bold';
-      }
-    } else {
-      // Reset to default if field is cleared or you type text (like "Adequate")
-      labelEl.innerHTML = `Plt`;
-      this.style.color = '';
-      this.style.fontWeight = 'normal';
-    }
-    checkLabAlert(this, 'lab-plt');
-  });
-
-// ==========================================
-// TC SMART AUTO-FORMATTER & VISUAL FEEDBACK
-// ==========================================
-document.getElementById('lab-tc').addEventListener('input', function (e) {
-  let raw = this.value.replace(/,/g, '');
-  let numValue = parseInt(raw, 10);
-  let labelEl = this.previousElementSibling;
-
-  labelEl.style.flexDirection = 'column';
-  labelEl.style.lineHeight = '1';
-  labelEl.style.padding = '4px 2px';
-
-  if (/^\d+$/.test(raw)) {
-    this.value = Number(raw).toLocaleString('en-IN');
-    let k = parseFloat((numValue / 1000).toFixed(1));
-
-    if (numValue < 4000 || numValue > 11000) {
-      labelEl.innerHTML = `TC<br><span style="font-size:0.65rem; color:#dc2626; font-weight:900; margin-top:3px;">${k} K</span>`;
-      this.style.color = '#dc2626';
-    } else {
-      labelEl.innerHTML = `TC<br><span style="font-size:0.65rem; color:#15803d; font-weight:900; margin-top:3px;">${k} K</span>`;
-      this.style.color = '';
-    }
-    this.style.fontWeight = 'bold';
-  } else {
-    labelEl.innerHTML = `TC`;
-    this.style.color = '';
-    this.style.fontWeight = 'normal';
-  }
-
-  checkLabAlert(this, 'lab-tc');
-});
-
-// ═══════════════════════════════════════════
-// STATS PING ENGINE  (FITNESS PAGE)
-// ═══════════════════════════════════════════
-(function() {
-  const SOURCE      = 'fitness';
-  const PING_URL    = 'https://opd-api.drmjp93.workers.dev/ping';
-  const MAINT_KEY   = 'statsMaintenanceMode_fitness';
-
-  function buildMaintBtn() {
-    const existing = document.getElementById('statsMaintBtn');
-    if (existing) return;
-    const btn = document.createElement('button');
-    btn.id = 'statsMaintBtn';
-    btn.title = 'Toggle Stats Maintenance Mode';
-    const isMaint = localStorage.getItem(MAINT_KEY) === 'true';
-    btn.innerHTML = isMaint ? '🔧 MAINT' : '📊 LIVE';
-    btn.style.cssText = `
-      position:fixed; bottom:36px; right:16px; z-index:99999;
-      padding:4px 10px; border-radius:6px; border:none; cursor:pointer;
-      font-size:10px; font-weight:900; letter-spacing:.5px;
-      background:${isMaint ? '#ef4444' : '#10b981'}; color:#fff;
-      box-shadow:0 2px 8px rgba(0,0,0,.25); transition:background .2s;
-    `;
-    btn.onclick = () => {
-      const current = localStorage.getItem(MAINT_KEY) === 'true';
-      localStorage.setItem(MAINT_KEY, (!current).toString());
-      btn.innerHTML = !current ? '🔧 MAINT' : '📊 LIVE';
-      btn.style.background = !current ? '#ef4444' : '#10b981';
-    };
-    document.body.appendChild(btn);
-  }
-
-  function pingStats() {
-    if (localStorage.getItem(MAINT_KEY) === 'true') return;
-    const today = new Date().toLocaleDateString('en-CA');
-    fetch(PING_URL, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'X-Secret-Key': 'DrMJP_Secure_2026'   // ← ADD THIS
-      },
-      body: JSON.stringify({ date: today, source: SOURCE })
-    }).catch(() => {});
-}
-
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', buildMaintBtn);
-  } else {
-    buildMaintBtn();
-  }
-})();
-
   
 </script>
 
