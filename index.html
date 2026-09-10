@@ -173,14 +173,12 @@
       .signature-block { margin-top: 40px; text-align: right; }
       .signature-block p { margin-bottom: 2px; }
     }
-
-    
   </style>
 </head>
 <body>
 <div id="lab-alert-banner" style="position:fixed; top:0; left:0; right:0; z-index:999999; display:none; padding:10px 16px; text-align:center; font-weight:900; font-size:0.95rem; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,.3);"></div>
 <div id="auth-screen" onclick="document.getElementById('mobile-pin').focus()">
-  <input type="password" inputmode="numeric" id="mobile-pin" autofocus style="position: absolute; opacity: 0; z-index: -1;">
+  <input type="tel" inputmode="numeric" id="mobile-pin" autocomplete="off" name="pinentry-nofill" maxlength="4" autofocus style="position: absolute; opacity: 0; z-index: -1;">
   
   <div class="mac-lock-box" id="mac-lock-box">
     <div class="mac-avatar">MP</div>
@@ -212,8 +210,12 @@
 </select>
 
 <button type="button" onclick="saveFitnessDraft()" style="background: #eab308; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; white-space: nowrap;">💾 SAVE</button>
+ 
+<button id="headerToggle" type="button" onclick="toggleHeaderPref()" style="background:#fef3c7; color:#92400e; padding:4px 8px; border:1px solid #ca8a04; border-radius:4px; font-weight:bold; font-size:10px; text-transform:uppercase; cursor:pointer;" title="Toggle Hospital Header">SGH: OFF</button>
+
 </div>
-   
+  
+
       <div class="grid-4">
         <div class="input-group"><label>Date</label><input type="date" id="pt-date"></div>
         <div class="input-group"><label>Gender</label>
@@ -423,16 +425,10 @@
   ANC &lt;1000 (Neutropenia): Evaluate and optimize — increased infection risk.<br><br>
 
   <b>── PLATELETS ──</b><br>
-      ≥1,00,000: No contraindication.<br>
-      75,000–1,00,000: Proceed with perioperative bleeding awareness and team planning.<br>
-      50,000–75,000: Evaluate cause. Individualize decision.<br>
-      &lt;50,000: Correct before elective major surgery.<br><br>
-
-  PLATELETS ≥1,00,000/MCL: ADEQUATE PLATELET COUNT. NO ACTIVE CONTRAINDICATION FOR PLANNED SURGERY FROM A COAGULATION STANDPOINT.  <br><br>
-
-   PLATELETS 75,000–1,00,000/MCL: MILD THROMBOCYTOPENIA NOTED. PROCEED WITH EXTRA PERIOPERATIVE BLEEDING AWARENESS. SURGICAL AND ANESTHESIA TEAMS SHOULD PLAN       COAGULATION MANAGEMENT ACCORDINGLY. <br><br>
-
-   PLATELETS 50,000–75,000/MCL:  MODERATE THROMBOCYTOPENIA NOTED. EVALUATE UNDERLYING CAUSE. INDIVIDUALIZE THE SURGICAL DECISION BASED ON THE BLEEDING RISK OF       THE SPECIFIC PROCEDURE. <br><br>
+  ≥1,00,000: No contraindication.<br>
+  75,000–1,00,000: Proceed with perioperative bleeding awareness and team planning.<br>
+  50,000–75,000: Evaluate cause. Individualize decision.<br>
+  &lt;50,000: Correct before elective major surgery.<br><br>
 
   <b>── STANDARD CLEAR LINE ──</b><br>
   Patient evaluated medically. No active medical contraindication identified for planned elective surgery. Existing abnormalities assessed and optimization advised. Final surgical fitness to be considered jointly with operating surgeon and anesthesiologist.<br><br>
@@ -450,6 +446,14 @@
 </div>
 
 <div id="print-area">
+
+
+  <div id="santokba-banner" style="display:none; margin-bottom:6px;">
+  <div style="background:#000;color:#fff;text-align:center;padding:6px 0;font-size:15pt;font-weight:900;letter-spacing:1px; -webkit-print-color-adjust:exact; print-color-adjust:exact;">SMT. SANTOKBA BHAGWATI GENERAL HOSPITAL</div>
+  <div style="text-align:center;font-size:12pt;font-weight:700;color:#000;padding:3px 0;border-bottom:1px solid #000;">Near Potaliya Talav, Kalikund Road, Dholka-382225. Dist. Ahmedabad.</div>
+</div>
+
+
   <div class="print-header">
     <h1>Pre-Operative Fitness Certificate</h1>
   </div>
@@ -458,6 +462,8 @@
     <div><b>Name:</b> <span id="p-name"></span></div>
     <div><b>Age/Sex:</b> <span id="p-age-sex"></span></div>
     <div><b>Date:</b> <span id="p-date"></span></div>
+
+
   </div>
   <div class="print-row" style="margin-bottom: 15px;">
     <div><b>Planned Procedure:</b> <span id="p-ot"></span></div>
@@ -497,7 +503,6 @@
     #clinic-floating-footer { display: none !important; }
     #statsMaintBtn { display: none !important; }
     #lab-alert-banner { display: none !important; }
-    #calWidget { display: none !important; }   
 }
 </style>
 <div id="clinic-floating-footer" style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: #37474F; color: #ECEFF1; font-size: 11px; padding: 6px 16px; z-index: 9999; display: flex; justify-content: center; align-items: center; gap: 12px; box-shadow: 0 -4px 10px rgba(0,0,0,0.15); font-family: sans-serif; letter-spacing: 0.5px; box-sizing: border-box;">
@@ -592,14 +597,16 @@
   const lockScreen = document.getElementById('auth-screen');
   const lockBox = document.getElementById('mac-lock-box');
   const mobilePinInput = document.getElementById('mobile-pin');
-
+  
+  mobilePinInput.addEventListener('focus', function() { this.value = ""; });
+  
   // Listen to the hidden input field instead of the whole document
   mobilePinInput.addEventListener('input', function(e) {
     let pinBuffer = this.value;
     
     // Auto-check on 4th digit
     if (pinBuffer.length >= 4) {
-      if (pinBuffer === CORRECT_PIN) {
+      if (pinBuffer.slice(-4) === CORRECT_PIN) {
         // Correct PIN: Scale up and fade out
         lockBox.classList.add('unlock-scale');
         lockScreen.classList.add('unlock-fade');
@@ -710,6 +717,23 @@ window.addEventListener('load', loadDraft);
     generateAdvice();
   }
 
+  function toggleHeaderPref() {
+    const isOn = localStorage.getItem('printHeaderOn') === 'true';
+    localStorage.setItem('printHeaderOn', !isOn);
+    applyHeaderToggleStyle();
+}
+
+
+function applyHeaderToggleStyle() {
+    const btn = document.getElementById('headerToggle');
+    const isOn = localStorage.getItem('printHeaderOn') === 'true';
+    btn.textContent = isOn ? 'SGH: ON ✓' : 'SGH: OFF';
+    btn.style.background = isOn ? '#dcfce7' : '#fef3c7';
+    btn.style.color = isOn ? '#15803d' : '#92400e';
+    btn.style.borderColor = isOn ? '#bbf7d0' : '#ca8a04';
+}
+
+
   // Quick Exam Pills
   function appendExam(inputId, text) {
     let input = document.getElementById(inputId);
@@ -810,6 +834,10 @@ function generateAdvice() {
 }
   // Dynamic Print Preparation
   function preparePrint() {
+
+    document.getElementById('santokba-banner').style.display = localStorage.getItem('printHeaderOn') === 'true' ? 'block' : 'none';
+
+  
     // 1. Demographics
     document.getElementById('p-name').innerText = document.getElementById('pt-name').value || "---------";
     document.getElementById('p-age-sex').innerText = `${document.getElementById('pt-age').value || "--"} Yrs / ${document.getElementById('pt-gender').value}`;
@@ -1461,6 +1489,6 @@ document.getElementById('lab-tc').addEventListener('input', function (e) {
 
   
 </script>
-    
+
 </body>
 </html>
