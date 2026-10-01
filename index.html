@@ -834,7 +834,7 @@ function generateAdvice() {
   saveDraft();
 }
   // Dynamic Print Preparation
-  function preparePrint() {
+  function fillPrintArea() {
 
     document.getElementById('santokba-banner').style.display = localStorage.getItem('printHeaderOn') === 'true' ? 'block' : 'none';
 
@@ -917,6 +917,11 @@ function generateAdvice() {
 
     // 6. Advice
     document.getElementById('p-advice').innerHTML = document.getElementById('advice-box').innerHTML;
+
+      }
+
+  function preparePrint() {
+    fillPrintArea();
 
     // --- NEW: Trigger the Fitness Counter Increment Before Printing ---
     fetch("https://visits.drmjp93.workers.dev/?tool=fit_printed")
@@ -1434,7 +1439,7 @@ document.getElementById('lab-tc').addEventListener('input', function (e) {
 
   checkLabAlert(this, 'lab-tc');
 });
-  
+  window.addEventListener('beforeprint', fillPrintArea);
 </script>
 
 </body>
