@@ -1446,19 +1446,8 @@ document.getElementById('lab-tc').addEventListener('input', function (e) {
   const words = name.trim().toUpperCase().split(/\s+/).filter(Boolean);
   if(!g || !words.length) return;
 
-  const fTitles = ['SMT','SMT.','MRS','MRS.','MISS','MS','MS.','BEHEN','BEN','BAI','BEGUM','KHATUN','BIBI','DEVI','KUMARI','KAUR'];
-  const mTitles = ['SHRI','SHRI.','MR','MR.','BHAI','KUMAR','SINGH','LAL','PRASAD'];
-  const fNames = ['PRIYA','POOJA','SITA','GEETA','SUNITA','ANITA','RITA','KAVITA','SAVITA','MEENA','REKHA','NEHA','RADHA','LAXMI','LAKSHMI','SEEMA','ANJALI','SONIA','SONI','SHEELA','KIRAN','RANI','SARITA','SUMAN','NISHA','ASHA','USHA','MAMTA','JYOTI','ARCHANA','DEEPA','SHWETA','KAJAL','PAYAL','RUBY','SAPNA','SUSHMA','SANGEETA','MANJU','SHANTI','PARVATI','DURGA','LATA','RENU','ANU','ANUSHKA','AARTI','ARTI','KOMAL','NIKITA','RINKU','TINA','ZARINA','FATIMA','AYESHA','SHABNAM','SABINA','NAZIA','RUKSANA','SHAKILA'];
-  const mNames = ['RAVI','HARI','KRISHNA','RAJA','MUNNA','SURESH','RAMESH','RAJESH','MUKESH','DINESH','MAHESH','AMIT','ROHIT','RAHUL','SANJAY','VIJAY','AJAY','ANIL','SUNIL','MANOJ','DEEPAK','VIKAS','ASHOK','RAM','SHYAM','MOHAN','SOHAN','GOPAL','KISHORE','ARUN','ARJUN','SACHIN','NITIN','PANKAJ','PRAKASH','NARESH','JITENDRA','RAKESH','SANDEEP','LAKHAN','BABLU','GUDDU','PAPPU','SONU','MONU','RAJU','KALU','SHIVA','MAHENDRA','RAVINDRA','NARENDRA','DHARMENDRA','GANESH','ANAND','ALI','AHMED','MOHD','MOHAMMAD','IMRAN','SALIM','RAFIQ','SHAKIL'];
-
-  if(words.some(w => /(BEN|BEHEN)$/.test(w) && w.length > 3)) { g.value = 'FEMALE'; return; }
-  if(words.some(w => /(BHAI)$/.test(w) && w.length > 4)) { g.value = 'MALE'; return; }
-  if(words.some(w => fTitles.includes(w))) { g.value = 'FEMALE'; return; }
-  if(words.some(w => mTitles.includes(w))) { g.value = 'MALE';   return; }
-
-  const first = words[0];
-  if(fNames.includes(first)) g.value = 'FEMALE';
-  else if(mNames.includes(first)) g.value = 'MALE';
+  if(words.some(w => /(BEN|BEHEN|BANU|BIBI)$/.test(w) && w.length > 3)) { g.value = 'FEMALE'; return; }
+  if(words.some(w => (/(BHAI|HUSEN|NATH)$/.test(w) && w.length > 4) || w === 'ALI' || w === 'LAL')) { g.value = 'MALE'; return; }
   // unknown name -> leave gender unchanged
 
 }
